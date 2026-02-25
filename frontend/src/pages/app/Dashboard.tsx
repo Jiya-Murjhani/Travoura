@@ -1,0 +1,345 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useBudget } from "@/contexts/BudgetContext";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  Plane,
+  Hotel,
+  Map,
+  Wallet,
+  Calendar,
+  ChevronRight,
+  Radio,
+  AlertCircle,
+  Clock,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+const quickActions = [
+  { to: "/app/flights", label: "Search Flights", icon: Plane },
+  { to: "/app/hotels", label: "Find Hotels", icon: Hotel },
+  { to: "/app/itineraries", label: "Itineraries", icon: Map },
+  { to: "/app/budget", label: "Budget Tracker", icon: Wallet },
+];
+
+const upcomingTrips = [
+  { id: "1", destination: "Bali", dates: "Dec 15 – 22, 2024", startDate: "2024-12-15" },
+  { id: "2", destination: "Paris", dates: "Mar 10 – 17, 2025", startDate: "2025-03-10" },
+];
+
+const pastTrips = [
+  { id: "3", destination: "Tokyo", dates: "Aug 2024", status: "past" },
+];
+
+const mockItineraries = [
+  { id: "1", name: "Bali 7-Day Adventure", date: "Dec 15, 2024", places: 8 },
+  { id: "2", name: "Paris City Break", date: "Mar 10, 2025", places: 5 },
+];
+
+const mockUpdates = [
+  { id: "1", text: "Flight JFK → LHR on time. Gate B12.", time: "2m ago", type: "flight" },
+  { id: "2", text: "Weather in Bali: Sunny, 28°C.", time: "1h ago", type: "weather" },
+  { id: "3", text: "Your hotel check-in is from 3:00 PM.", time: "3h ago", type: "hotel" },
+];
+
+function getDaysUntil(dateStr: string): number | null {
+  const target = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
+  const diff = target.getTime() - today.getTime();
+  if (diff < 0) return null;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [authVerified, setAuthVerified] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
+  useEffect(() => {
+    const verifyAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:5000/protected", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setAuthVerified(true);
+        } else if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem("token");
+          navigate("/login", { replace: true });
+        }
+      } catch (error) {
+        console.error("Auth verification failed:", error);
+        localStorage.removeItem("token");
+        navigate("/login", { replace: true });
+      }
+    };
+
+    verifyAuth();
+  }, [navigate]);
+
+  const { budgetData } = useBudget();
+  const budgetPercent = budgetData.total > 0
+    ? Math.min(100, (budgetData.spent / budgetData.total) * 100)
+    : 0;
+
+  const nextTrip = upcomingTrips[0];
+  const daysUntil = nextTrip ? getDaysUntil(nextTrip.startDate) : null;
+
+  if (!authVerified) {
+    return null;
+  }
+
+  return (
+    <div className="p-6 md:p-8 lg:p-10">
+      <div className="mx-auto max-w-6xl space-y-10">
+        {/* Welcome Header + Quick Actions – vertical rhythm: space-y-10 between sections */}
+        <section className="space-y-6">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                Dashboard
+              </p>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Welcome back, {user?.username ?? "Traveler"}!
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Plan and manage your next adventure from one place.
+              </p>
+              {daysUntil !== null && nextTrip && (
+                <div className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">
+                    {daysUntil === 0
+                      ? "Departure today – "
+                      : daysUntil === 1
+                        ? "1 day until "
+                        : `${daysUntil} days until `}
+                    <span className="text-primary">{nextTrip.destination}</span>
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {quickActions.map(({ to, label, icon: Icon }) => (
+                <Button
+                  key={to}
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <Link to={to} className="inline-flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* My Trips */}
+        <section className="space-y-6">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            My Trips
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="rounded-3xl border-border/80 bg-card p-6 shadow-soft transition-all duration-200 hover:shadow-elevated">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  Upcoming
+                </CardTitle>
+                <CardDescription>Your next getaways</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {upcomingTrips.length === 0 ? (
+                  <p className="py-6 text-center text-sm text-muted-foreground">
+                    No upcoming trips. Start by searching flights or hotels.
+                  </p>
+                ) : (
+                  upcomingTrips.map((trip) => (
+                    <div
+                      key={trip.id}
+                      className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/30 px-5 py-4 transition-colors hover:bg-muted/50"
+                    >
+                      <div>
+                        <p className="font-semibold text-foreground">{trip.destination}</p>
+                        <p className="text-sm text-muted-foreground">{trip.dates}</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+            <Card className="rounded-3xl border-border/80 bg-card p-6 shadow-soft transition-all duration-200 hover:shadow-elevated">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-lg">Past</CardTitle>
+                <CardDescription>Trips you’ve taken</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pastTrips.length === 0 ? (
+                  <p className="py-6 text-center text-sm text-muted-foreground">
+                    No past trips yet.
+                  </p>
+                ) : (
+                  pastTrips.map((trip) => (
+                    <div
+                      key={trip.id}
+                      className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/30 px-5 py-4 opacity-90"
+                    >
+                      <div>
+                        <p className="font-semibold text-foreground">{trip.destination}</p>
+                        <p className="text-sm text-muted-foreground">{trip.dates}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* My Itineraries */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              My Itineraries
+            </h2>
+            <Button asChild variant="ghost" size="sm" className="rounded-xl transition-colors duration-200">
+              <Link to="/app/itineraries">View all</Link>
+            </Button>
+          </div>
+          <Card className="overflow-hidden rounded-3xl border-border/80 bg-card shadow-soft transition-all duration-200 hover:shadow-elevated">
+            <CardContent className="p-0">
+              {mockItineraries.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
+                  <Map className="mb-4 h-12 w-12 opacity-50" />
+                  <p className="mb-6">No itineraries yet.</p>
+                  <Button asChild variant="outline" size="sm" className="rounded-xl transition-all duration-200 hover:shadow-md">
+                    <Link to="/itineraries/new">Create itinerary</Link>
+                  </Button>
+                </div>
+              ) : (
+                <ul className="divide-y divide-border/60">
+                  {mockItineraries.map((it) => (
+                    <li key={it.id}>
+                      <Link
+                        to={`/itineraries/${it.id}`}
+                        className="flex items-center justify-between px-6 py-5 transition-colors duration-200 hover:bg-muted/30"
+                      >
+                        <div>
+                          <p className="font-semibold text-foreground">{it.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {it.date} · {it.places} places
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Budget + Real-Time Updates */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          <section className="space-y-6">
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              Budget Overview
+            </h2>
+            <Card className="rounded-3xl border-border/80 bg-card p-6 shadow-soft transition-all duration-200 hover:shadow-elevated">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Wallet className="h-5 w-5 text-primary" />
+                  Spending progress
+                </CardTitle>
+                <CardDescription>
+                  ₹{budgetData.spent.toLocaleString()} of ₹{budgetData.total.toLocaleString()} used
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Progress value={budgetPercent} className="h-3 rounded-full" />
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">0%</span>
+                  <span className="font-semibold text-foreground">{Math.round(budgetPercent)}%</span>
+                  <span className="text-muted-foreground">100%</span>
+                </div>
+                <Button asChild variant="outline" size="sm" className="w-full rounded-xl transition-all duration-200 hover:shadow-md">
+                  <Link to="/app/budget">Open Budget Tracker</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </section>
+
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                Real-Time Updates
+              </h2>
+              <Button asChild variant="ghost" size="sm" className="rounded-xl transition-colors duration-200">
+                <Link to="/app/updates">View all</Link>
+              </Button>
+            </div>
+            <Card className="rounded-3xl border-border/80 bg-card p-6 shadow-soft transition-all duration-200 hover:shadow-elevated">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Radio className="h-5 w-5 text-primary" />
+                  Live updates
+                </CardTitle>
+                <CardDescription>Flight, weather, and booking updates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-4">
+                  {mockUpdates.map((update) => (
+                    <li
+                      key={update.id}
+                      className="flex gap-4 rounded-2xl border border-border/60 bg-muted/20 px-5 py-4 transition-colors hover:bg-muted/30"
+                    >
+                      <AlertCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-foreground">{update.text}</p>
+                        <p className="text-xs text-muted-foreground">{update.time}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
