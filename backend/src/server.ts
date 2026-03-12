@@ -3,6 +3,7 @@ import cors from 'cors';
 import { testConnection } from './db';
 import { authenticateToken } from './middleware/authMiddleware';
 import userRoutes from './routes/userRoutes';
+import tripRoutes from './routes/tripRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -39,6 +40,7 @@ app.get('/protected', authenticateToken, (req, res) => {
 
 // API routes
 app.use('/api/users', userRoutes);
+app.use('/api/trips', tripRoutes);
 
 // Start server
 app.listen(PORT, () => {
