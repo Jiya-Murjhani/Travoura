@@ -3,10 +3,11 @@ import { Wallet, TrendingUp, TrendingDown } from "lucide-react";
 interface BudgetHeaderProps {
   totalBudget: number;
   totalSpent: number;
+  tripName?: string;
   currency?: string;
 }
 
-const BudgetHeader = ({ totalBudget, totalSpent, currency = "₹" }: BudgetHeaderProps) => {
+const BudgetHeader = ({ totalBudget, totalSpent, tripName = "My Trip", currency = "₹" }: BudgetHeaderProps) => {
   const remaining = totalBudget - totalSpent;
   const percentSpent = (totalSpent / totalBudget) * 100;
   const isOverBudget = remaining < 0;
@@ -24,7 +25,7 @@ const BudgetHeader = ({ totalBudget, totalSpent, currency = "₹" }: BudgetHeade
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-display font-bold">Trip Budget Tracker</h1>
-            <p className="text-primary-foreground/70 text-sm">Bali Adventure 2024</p>
+            <p className="text-primary-foreground/70 text-sm">{tripName}</p>
           </div>
         </div>
 

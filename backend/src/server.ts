@@ -1,15 +1,26 @@
+import dotenv from 'dotenv';
+dotenv.config({ override: true });
 import express from 'express';
 import cors from 'cors';
-import { testConnection } from './db';
 import { authenticateToken } from './middleware/authMiddleware';
-import userRoutes from './routes/userRoutes';
 import tripRoutes from './routes/tripRoutes';
+import itineraryRoutes from './routes/itinerary';
+import expenseRoutes from './routes/expenses';
+import preferencesRoutes from './routes/preferencesRoutes';
+import exploreRoutes from './routes/explore';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://travoura.vercel.app', // your Vercel URL (update after deploy)
+    process.env.FRONTEND_URL || ''
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -17,30 +28,16 @@ app.get('/', (_req, res) => {
   res.json({ message: 'Travoura API is running' });
 });
 
-app.get('/test-db', async (_req, res) => {
-  try {
-    const isConnected = await testConnection();
-    if (isConnected) {
-      res.json({ success: true, message: 'PostgreSQL connection successful' });
-    } else {
-      res.status(500).json({ success: false, message: 'PostgreSQL connection failed' });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Database connection error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
-
 app.get('/protected', authenticateToken, (req, res) => {
-  res.json({ message: 'You accessed protected route' });
+  res.json({ message: 'You accessed protected route', user: (req as any).user });
 });
 
 // API routes
-app.use('/api/users', userRoutes);
+app.use('/api/trips/:tripId/expenses', expenseRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/itinerary', itineraryRoutes);
+app.use('/api/preferences', preferencesRoutes);
+app.use('/api/explore', exploreRoutes);
 
 // Start server
 app.listen(PORT, () => {

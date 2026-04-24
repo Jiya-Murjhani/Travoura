@@ -4,6 +4,7 @@ import { Plane, Mail, Lock, Eye, EyeOff, ArrowRight, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/lib/supabaseClient";
 
 const Signup = () => {
   const [fullName, setFullName] = useState("");
@@ -60,29 +61,22 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: fullName,
-          email,
-          password,
-        }),
-      });
+      const { data, error } = await supabase.auth.signUp({
+  email,
+  password,
+  options: {
+    data: {
+      full_name: fullName,   // stores name in Supabase user metadata
+    }
+  }
+});
 
-      const data = await response.json();
+if (error) {
+  setErrors((prev) => ({ ...prev, form: error.message }));
+  return;
+}
 
-      if (response.ok && data.success) {
-        alert("Signup successful! Please log in.");
-        navigate("/login", { replace: true });
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          form: data?.message || "Registration failed. Please try again.",
-        }));
-      }
+navigate("/login", { replace: true });
     } catch (error) {
       console.error("Signup failed:", error);
       setErrors((prev) => ({

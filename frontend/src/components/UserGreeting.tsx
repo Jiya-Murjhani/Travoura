@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 
 const UserGreeting = () => {
-  const { user } = useAuth();
+  const { user, displayName } = useAuth();
 
   if (!user) {
     return null;
@@ -18,9 +18,6 @@ const UserGreeting = () => {
     }
   };
 
-  // Capitalize first letter of username
-  const displayName = user.username.charAt(0).toUpperCase() + user.username.slice(1);
-
   return (
     <div className="text-center mb-4 animate-fade-in">
       <p className="text-2xl md:text-3xl font-semibold text-white drop-shadow-lg">
@@ -31,4 +28,3 @@ const UserGreeting = () => {
 };
 
 export default UserGreeting;
-

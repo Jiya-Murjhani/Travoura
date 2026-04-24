@@ -37,6 +37,7 @@ const BudgetTracker = () => {
     updateExpense,
     deleteExpense,
     updateBudget,
+    activeTripName,
   } = useBudget();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -127,6 +128,7 @@ const BudgetTracker = () => {
           <BudgetHeader 
             totalBudget={budgetData.total} 
             totalSpent={budgetData.spent} 
+            tripName={activeTripName}
           />
           <Button
             variant="outline"

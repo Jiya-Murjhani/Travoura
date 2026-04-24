@@ -1,0 +1,568 @@
+/* ── Travoura Home Navbar Styles ── */
+
+/* Logo wordmark shimmer on hover */
+@keyframes logo-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* Dropdown slide-in */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* Nav underline grow */
+@keyframes nav-underline-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ── Layer 1 strip ── */
+.tnav-strip {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 0 clamp(20px, 4vw, 72px);
+  transition: opacity 300ms ease, transform 300ms ease, height 300ms ease;
+}
+.tnav-strip.hidden-strip {
+  opacity: 0;
+  transform: translateY(-100%);
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ── Layer 2 main bar ── */
+.tnav-main {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 clamp(20px, 4vw, 72px);
+  gap: 0;
+  position: relative;
+}
+
+/* ── Wrapper (fixed, full width) ── */
+.tnav-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  transition:
+    background 350ms cubic-bezier(0.16,1,0.3,1),
+    backdrop-filter 350ms ease,
+    box-shadow 350ms ease;
+}
+.tnav-wrapper.transparent {
+  background: transparent;
+}
+.tnav-wrapper.frosted {
+  background: rgba(253,252,250,0.93);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 1px 0 rgba(232,220,200,0.5), 0 4px 24px rgba(0,0,0,0.04);
+}
+
+/* ── Logo ── */
+.tnav-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.tnav-logo-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.tnav-logo-word {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: color 350ms ease;
+}
+.tnav-wrapper.transparent .tnav-logo-word { color: #FDFCFA; }
+.tnav-wrapper.frosted    .tnav-logo-word { color: #1A1A1A; }
+
+.tnav-logo:hover .tnav-logo-word {
+  background: linear-gradient(90deg, #8C6D2F 0%, #E8C86C 40%, #C9A84C 50%, #E8C86C 60%, #8C6D2F 100%);
+  background-size: 200% auto;
+  animation: logo-shimmer 1.8s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Nav items center ── */
+.tnav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tnav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: color 200ms ease, background 200ms ease;
+  white-space: nowrap;
+  border: none;
+  background: none;
+  text-decoration: none;
+}
+
+.tnav-wrapper.transparent .tnav-link        { color: rgba(253,252,250,0.85); }
+.tnav-wrapper.transparent .tnav-link:hover  { color: #FDFCFA; background: rgba(255,255,255,0.08); }
+.tnav-wrapper.frosted    .tnav-link         { color: #6B6560; }
+.tnav-wrapper.frosted    .tnav-link:hover   { color: #1A1A1A; background: rgba(232,220,200,0.25); }
+
+/* Underline on active nav item */
+.tnav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 14px;
+  right: 14px;
+  height: 1.5px;
+  background: var(--color-gold, #C9A84C);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 250ms cubic-bezier(0.16,1,0.3,1);
+  border-radius: 1px;
+}
+.tnav-link.active::after,
+.tnav-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* ── AI CTA nav item (special gold style) ── */
+.tnav-link-ai {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  transition: all 250ms ease;
+  border: 1.5px solid transparent;
+}
+.tnav-wrapper.transparent .tnav-link-ai {
+  color: #C9A84C;
+  border-color: rgba(201,168,76,0.45);
+  background: rgba(201,168,76,0.08);
+}
+.tnav-wrapper.transparent .tnav-link-ai:hover {
+  color: #0A0A0B;
+  background: #C9A84C;
+  border-color: #C9A84C;
+}
+.tnav-wrapper.frosted .tnav-link-ai {
+  color: #1A1A1A;
+  border-color: #C9A84C;
+  background: rgba(201,168,76,0.06);
+}
+.tnav-wrapper.frosted .tnav-link-ai:hover {
+  color: #0A0A0B;
+  background: #C9A84C;
+  border-color: #C9A84C;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+}
+.tnav-link-ai::after { display: none; }
+
+/* ── Right side controls ── */
+.tnav-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* ── Selector buttons (country, currency) ── */
+.tnav-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  font-weight: 450;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 200ms ease;
+}
+.tnav-wrapper.transparent .tnav-selector        { color: rgba(253,252,250,0.7); }
+.tnav-wrapper.transparent .tnav-selector:hover  { color: #FDFCFA; background: rgba(255,255,255,0.08); }
+.tnav-wrapper.frosted    .tnav-selector         { color: #9B9590; }
+.tnav-wrapper.frosted    .tnav-selector:hover   { color: #1A1A1A; background: rgba(232,220,200,0.2); }
+
+/* ── Divider ── */
+.tnav-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(232,220,200,0.4);
+  flex-shrink: 0;
+}
+.tnav-wrapper.transparent .tnav-divider { background: rgba(253,252,250,0.2); }
+
+/* ── Strip auth buttons ── */
+.tnav-btn-signin {
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 200ms ease;
+  white-space: nowrap;
+}
+.tnav-wrapper.transparent .tnav-btn-signin        { color: rgba(253,252,250,0.85); }
+.tnav-wrapper.transparent .tnav-btn-signin:hover  { color: #FDFCFA; background: rgba(255,255,255,0.1); }
+.tnav-wrapper.frosted    .tnav-btn-signin         { color: #6B6560; }
+.tnav-wrapper.frosted    .tnav-btn-signin:hover   { color: #1A1A1A; background: rgba(232,220,200,0.2); }
+
+.tnav-btn-register {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 250ms ease;
+  white-space: nowrap;
+}
+.tnav-wrapper.transparent .tnav-btn-register {
+  background: rgba(201,168,76,0.15);
+  border: 1px solid rgba(201,168,76,0.4);
+  color: #E8C86C;
+}
+.tnav-wrapper.transparent .tnav-btn-register:hover {
+  background: #C9A84C;
+  border-color: #C9A84C;
+  color: #0A0A0B;
+}
+.tnav-wrapper.frosted .tnav-btn-register {
+  background: #1A1A1A;
+  border: 1px solid #1A1A1A;
+  color: #F7F5F0;
+}
+.tnav-wrapper.frosted .tnav-btn-register:hover {
+  background: #C9A84C;
+  border-color: #C9A84C;
+  color: #0A0A0B;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+}
+
+/* ── Notification bell ── */
+.tnav-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+  position: relative;
+  transition: background 200ms ease;
+  flex-shrink: 0;
+}
+.tnav-wrapper.transparent .tnav-bell { color: rgba(253,252,250,0.8); }
+.tnav-wrapper.transparent .tnav-bell:hover { color:#FDFCFA; background:rgba(255,255,255,0.1); }
+.tnav-wrapper.frosted    .tnav-bell { color: #9B9590; }
+.tnav-wrapper.frosted    .tnav-bell:hover { color:#1A1A1A; background:rgba(232,220,200,0.25); }
+
+.tnav-bell-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #C9A84C;
+  border: 1.5px solid transparent;
+}
+.tnav-wrapper.transparent .tnav-bell-dot { border-color: transparent; }
+.tnav-wrapper.frosted    .tnav-bell-dot  { border-color: rgba(253,252,250,0.9); }
+
+/* ── User avatar circle ── */
+.tnav-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  transition: all 200ms ease;
+  flex-shrink: 0;
+  border: none;
+}
+.tnav-wrapper.transparent .tnav-avatar {
+  background: rgba(201,168,76,0.2);
+  color: #E8C86C;
+  border: 1.5px solid rgba(201,168,76,0.4);
+}
+.tnav-wrapper.transparent .tnav-avatar:hover {
+  background: rgba(201,168,76,0.32);
+  border-color: rgba(201,168,76,0.7);
+}
+.tnav-wrapper.frosted .tnav-avatar {
+  background: #1A1A1A;
+  color: #F7F5F0;
+  border: 1.5px solid transparent;
+}
+.tnav-wrapper.frosted .tnav-avatar:hover {
+  background: #C9A84C;
+  color: #0A0A0B;
+  border-color: #C9A84C;
+}
+
+/* ── Dropdown menus (shared) ── */
+.tnav-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  background: rgba(253,252,250,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(232,220,200,0.6);
+  border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+  animation: dropdown-in 200ms cubic-bezier(0.16,1,0.3,1) forwards;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.tnav-dropdown-avatar {
+  right: 0;
+  min-width: 220px;
+  padding: 8px;
+}
+
+.tnav-dropdown-selector {
+  left: 0;
+  min-width: 200px;
+  padding: 6px;
+}
+
+/* Dropdown: user info header */
+.tnav-dropdown-header {
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid rgba(232,220,200,0.5);
+  margin-bottom: 6px;
+}
+.tnav-dropdown-header-name {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+.tnav-dropdown-header-email {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 12px;
+  color: #9B9590;
+  margin-top: 2px;
+}
+
+/* Dropdown: menu items */
+.tnav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: #6B6560;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+  white-space: nowrap;
+}
+.tnav-dropdown-item:hover {
+  background: rgba(232,220,200,0.35);
+  color: #1A1A1A;
+}
+.tnav-dropdown-item svg {
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+.tnav-dropdown-item:hover svg { opacity: 1; }
+
+.tnav-dropdown-item.signout {
+  color: #B33A3A;
+  margin-top: 4px;
+  border-top: 1px solid rgba(232,220,200,0.4);
+  padding-top: 10px;
+}
+.tnav-dropdown-item.signout:hover {
+  background: rgba(179,58,58,0.06);
+  color: #B33A3A;
+}
+
+/* Dropdown: separator */
+.tnav-dropdown-sep {
+  height: 1px;
+  background: rgba(232,220,200,0.45);
+  margin: 4px 12px;
+}
+
+/* Dropdown: selector option rows */
+.tnav-selector-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 13px;
+  color: #6B6560;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  transition: background 150ms ease, color 150ms ease;
+}
+.tnav-selector-option:hover  { background: rgba(232,220,200,0.35); color: #1A1A1A; }
+.tnav-selector-option.active { color: #C9A84C; font-weight: 500; }
+.tnav-selector-option.active:hover { background: rgba(201,168,76,0.08); }
+
+/* ── Chevron icon ── */
+.tnav-chevron {
+  width: 12px;
+  height: 12px;
+  transition: transform 200ms ease;
+  flex-shrink: 0;
+}
+.tnav-chevron.open { transform: rotate(180deg); }
+
+/* ── Mobile hamburger (shown below md) ── */
+.tnav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 200ms ease;
+}
+.tnav-wrapper.transparent .tnav-hamburger { color: rgba(253,252,250,0.9); }
+.tnav-wrapper.frosted    .tnav-hamburger { color: #1A1A1A; }
+.tnav-hamburger:hover { background: rgba(201,168,76,0.1); }
+
+@media (max-width: 1023px) {
+  .tnav-links   { display: none; }
+  .tnav-hamburger { display: flex; }
+  .tnav-right > .tnav-bell { display: flex; }
+}
+
+/* ── Mobile drawer ── */
+.tnav-mobile-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+.tnav-mobile-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,10,11,0.5);
+  backdrop-filter: blur(4px);
+}
+.tnav-mobile-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(360px, 90vw);
+  background: rgba(253,252,250,0.98);
+  backdrop-filter: blur(20px);
+  padding: 80px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: dropdown-in 250ms cubic-bezier(0.16,1,0.3,1) forwards;
+  overflow-y: auto;
+}
+.tnav-mobile-link {
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 450;
+  color: #6B6560;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: none;
+  text-align: left;
+  transition: background 150ms ease, color 150ms ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tnav-mobile-link:hover  { background: rgba(232,220,200,0.3); color: #1A1A1A; }
+.tnav-mobile-link.ai-link {
+  margin-top: 8px;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: #C9A84C;
+  font-weight: 500;
+}
+.tnav-mobile-link.ai-link:hover { background: #C9A84C; color: #0A0A0B; }
+.tnav-mobile-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(232,220,200,0.3);
+  cursor: pointer;
+  color: #1A1A1A;
+  transition: background 150ms ease;
+}
+.tnav-mobile-close:hover { background: rgba(232,220,200,0.6); }

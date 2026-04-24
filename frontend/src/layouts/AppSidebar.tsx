@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   Plane,
   LayoutDashboard,
+  Compass,
   Hotel,
   Car,
   CalendarDays,
@@ -29,6 +30,7 @@ import {
 
 const navItems = [
   { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/app/explore", label: "Explore", icon: Compass },
   { to: "/app/flights", label: "Flights", icon: Plane },
   { to: "/app/hotels", label: "Hotels", icon: Hotel },
   { to: "/app/transport", label: "Transport", icon: Car },

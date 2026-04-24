@@ -4,46 +4,25 @@ import { Plane, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState("");
 
   const handleLogin = async (email: string, password: string) => {
-    try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-      const data = await response.json();
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-      if (data.success) {
-        // Store token in localStorage
-        localStorage.setItem("token", data.token);
-        login(data.user?.email ?? email, data.user?.name ?? "");
-
-        alert("Login successful 🎉");
-
-        // Redirect to travel hub
-        navigate("/home", { replace: true });
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
+  navigate("/home", { replace: true });
+};
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,6 +119,11 @@ const Login = () => {
                       Forgot password?
                     </Link>
                   </div>
+
+              
+                  {error && (
+                    <p className="text-sm text-red-500 text-center">{error}</p>
+                  )} 
 
                   <Button
                     type="submit"

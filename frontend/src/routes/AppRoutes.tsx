@@ -27,6 +27,8 @@ import Home from "@/pages/Home";
 import CreateTrip from "@/pages/CreateTrip";
 import Trips from "@/pages/Trips";
 import TripDashboard from "@/pages/TripDashboard";
+import GenerateItineraryWrapper from "@/pages/GenerateItinerary";
+import ExplorePage from "@/pages/ExplorePage";
 
 export const AppRoutes = () => {
   return (
@@ -78,6 +80,22 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/trip/:tripId/generate-itinerary"
+          element={
+            <ProtectedRoute>
+              <GenerateItineraryWrapper />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/generate-itinerary"
+          element={
+            <ProtectedRoute>
+              <GenerateItineraryWrapper />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Existing itineraries and app layout */}
         <Route path="/itineraries" element={<ItinerariesDashboard />} />
@@ -87,6 +105,7 @@ export const AppRoutes = () => {
         <Route path="/startplanning" element={<StartPlanning />} />
         <Route path="/itinerary-results" element={<ItineraryResults />} />
         <Route path="/itinerary" element={<ItineraryResults />} />
+        <Route path="/itinerary/:id" element={<ItineraryView />} />
 
         <Route
           path="/app"
@@ -98,6 +117,7 @@ export const AppRoutes = () => {
         >
           <Route index element={<Navigate to="/app/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="explore" element={<ExplorePage />} />
           <Route path="flights" element={<Flights />} />
           <Route path="hotels" element={<Hotels />} />
           <Route path="transport" element={<Transport />} />

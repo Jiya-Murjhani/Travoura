@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 import { useBudget } from "@/contexts/BudgetContext";
 import {
   Card,
@@ -31,20 +31,6 @@ const quickActions = [
   { to: "/app/budget", label: "Budget Tracker", icon: Wallet },
 ];
 
-const upcomingTrips = [
-  { id: "1", destination: "Bali", dates: "Dec 15 – 22, 2024", startDate: "2024-12-15" },
-  { id: "2", destination: "Paris", dates: "Mar 10 – 17, 2025", startDate: "2025-03-10" },
-];
-
-const pastTrips = [
-  { id: "3", destination: "Tokyo", dates: "Aug 2024", status: "past" },
-];
-
-const mockItineraries = [
-  { id: "1", name: "Bali 7-Day Adventure", date: "Dec 15, 2024", places: 8 },
-  { id: "2", name: "Paris City Break", date: "Mar 10, 2025", places: 5 },
-];
-
 const mockUpdates = [
   { id: "1", text: "Flight JFK → LHR on time. Gate B12.", time: "2m ago", type: "flight" },
   { id: "2", text: "Weather in Bali: Sunny, 28°C.", time: "1h ago", type: "weather" },
@@ -52,6 +38,7 @@ const mockUpdates = [
 ];
 
 function getDaysUntil(dateStr: string): number | null {
+  if (!dateStr) return null;
   const target = new Date(dateStr);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -61,66 +48,100 @@ function getDaysUntil(dateStr: string): number | null {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+type Trip = {
+  id: string;
+  destination: string;
+  dates: string;
+  startDate?: string;
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [authVerified, setAuthVerified] = useState(false);
+  const [userName, setUserName] = useState("Traveler");
+  const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [pastTrips, setPastTrips] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     navigate("/login", { replace: true });
   };
 
   useEffect(() => {
-    const verifyAuth = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
+    const fetchData = async () => {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
         navigate("/login", { replace: true });
         return;
       }
 
-      try {
-        const response = await fetch("http://localhost:5000/protected", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      // Get name from metadata
+      const name = user.user_metadata?.full_name ?? user.email ?? "Traveler";
+      setUserName(name);
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setAuthVerified(true);
-        } else if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("token");
-          navigate("/login", { replace: true });
-        }
-      } catch (error) {
-        console.error("Auth verification failed:", error);
-        localStorage.removeItem("token");
-        navigate("/login", { replace: true });
+      // Fetch trips
+      const { data: trips, error } = await supabase
+        .from("trips")
+        .select("*")
+        .order("start_date", { ascending: true });
+
+      if (error) {
+        console.error("Failed to fetch trips:", error);
+        setLoading(false);
+        return;
       }
+
+      const today = new Date().toISOString().split("T")[0];
+
+      setUpcomingTrips(
+        (trips ?? [])
+          .filter((t) => !t.start_date || t.start_date >= today || t.status === "planning")
+          .map((t) => ({
+            id: t.id,
+            destination: t.destination,
+            dates: t.start_date ?? "Date TBD",
+            startDate: t.start_date,
+          }))
+      );
+
+      setPastTrips(
+        (trips ?? [])
+          .filter((t) => t.start_date && t.start_date < today && t.status !== "planning")
+          .map((t) => ({
+            id: t.id,
+            destination: t.destination,
+            dates: t.start_date,
+          }))
+      );
+
+      setLoading(false);
     };
 
-    verifyAuth();
+    fetchData();
   }, [navigate]);
 
   const { budgetData } = useBudget();
-  const budgetPercent = budgetData.total > 0
-    ? Math.min(100, (budgetData.spent / budgetData.total) * 100)
-    : 0;
+  const budgetPercent =
+    budgetData.total > 0
+      ? Math.min(100, (budgetData.spent / budgetData.total) * 100)
+      : 0;
 
   const nextTrip = upcomingTrips[0];
-  const daysUntil = nextTrip ? getDaysUntil(nextTrip.startDate) : null;
+  const daysUntil = nextTrip?.startDate ? getDaysUntil(nextTrip.startDate) : null;
 
-  if (!authVerified) {
-    return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground text-sm">Loading your dashboard...</p>
+      </div>
+    );
   }
 
   return (
     <div className="p-6 md:p-8 lg:p-10">
       <div className="mx-auto max-w-6xl space-y-10">
-        {/* Welcome Header + Quick Actions – vertical rhythm: space-y-10 between sections */}
+        {/* Welcome Header + Quick Actions */}
         <section className="space-y-6">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
@@ -128,7 +149,7 @@ export default function Dashboard() {
                 Dashboard
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                Welcome back, {user?.username ?? "Traveler"}!
+                Welcome back, {userName}!
               </h1>
               <p className="text-lg text-muted-foreground">
                 Plan and manage your next adventure from one place.
@@ -162,6 +183,14 @@ export default function Dashboard() {
                   </Link>
                 </Button>
               ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              >
+                Logout
+              </Button>
             </div>
           </div>
         </section>
@@ -172,6 +201,7 @@ export default function Dashboard() {
             My Trips
           </h2>
           <div className="grid gap-6 md:grid-cols-2">
+            {/* Upcoming */}
             <Card className="rounded-3xl border-border/80 bg-card p-6 shadow-soft transition-all duration-200 hover:shadow-elevated">
               <CardHeader className="space-y-1 pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -182,13 +212,19 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {upcomingTrips.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-muted-foreground">
-                    No upcoming trips. Start by searching flights or hotels.
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-6 text-center gap-4">
+                    <p className="text-sm text-muted-foreground">
+                      No upcoming trips yet.
+                    </p>
+                    <Button asChild variant="outline" size="sm" className="rounded-xl">
+                      <Link to="/create-trip">Plan a trip</Link>
+                    </Button>
+                  </div>
                 ) : (
                   upcomingTrips.map((trip) => (
-                    <div
+                    <Link
                       key={trip.id}
+                      to={`/trip/${trip.id}`}
                       className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/30 px-5 py-4 transition-colors hover:bg-muted/50"
                     >
                       <div>
@@ -196,15 +232,17 @@ export default function Dashboard() {
                         <p className="text-sm text-muted-foreground">{trip.dates}</p>
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
+                    </Link>
                   ))
                 )}
               </CardContent>
             </Card>
+
+            {/* Past */}
             <Card className="rounded-3xl border-border/80 bg-card p-6 shadow-soft transition-all duration-200 hover:shadow-elevated">
               <CardHeader className="space-y-1 pb-4">
                 <CardTitle className="text-lg">Past</CardTitle>
-                <CardDescription>Trips you’ve taken</CardDescription>
+                <CardDescription>Trips you've taken</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {pastTrips.length === 0 ? (
@@ -241,34 +279,13 @@ export default function Dashboard() {
           </div>
           <Card className="overflow-hidden rounded-3xl border-border/80 bg-card shadow-soft transition-all duration-200 hover:shadow-elevated">
             <CardContent className="p-0">
-              {mockItineraries.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
-                  <Map className="mb-4 h-12 w-12 opacity-50" />
-                  <p className="mb-6">No itineraries yet.</p>
-                  <Button asChild variant="outline" size="sm" className="rounded-xl transition-all duration-200 hover:shadow-md">
-                    <Link to="/itineraries/new">Create itinerary</Link>
-                  </Button>
-                </div>
-              ) : (
-                <ul className="divide-y divide-border/60">
-                  {mockItineraries.map((it) => (
-                    <li key={it.id}>
-                      <Link
-                        to={`/itineraries/${it.id}`}
-                        className="flex items-center justify-between px-6 py-5 transition-colors duration-200 hover:bg-muted/30"
-                      >
-                        <div>
-                          <p className="font-semibold text-foreground">{it.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {it.date} · {it.places} places
-                          </p>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground">
+                <Map className="mb-4 h-12 w-12 opacity-50" />
+                <p className="mb-6">No itineraries yet.</p>
+                <Button asChild variant="outline" size="sm" className="rounded-xl transition-all duration-200 hover:shadow-md">
+                  <Link to="/itineraries/new">Create itinerary</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </section>

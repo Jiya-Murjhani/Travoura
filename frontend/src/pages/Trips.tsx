@@ -1,39 +1,50 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TripCard, Trip } from "@/components/TripCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Trips = () => {
+  const { session } = useAuth();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchTrips = async () => {
+      if (!session?.user) return;
+
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/trips", {
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
+        const { data, error: fetchError } = await supabase
+          .from("trips")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-        const data = await response.json();
+        if (fetchError) {
+          console.error("Fetch trips error:", fetchError);
+          setError(fetchError.message || "Could not load trips.");
+          return;
+        }
 
-        if (response.ok && Array.isArray(data.trips)) {
+        if (Array.isArray(data)) {
           setTrips(
-            data.trips.map((t: any) => ({
-              id: String(t.id),
-              destination: t.destination,
-              startDate: t.startDate,
-              endDate: t.endDate,
-              budget: Number(t.budget) || 0,
+            data.map((t: any) => ({
+              id: String(t.id || t.trip_id),
+              destination: t.destination || "Unknown",
+              startDate: t.start_date || "",
+              durationDays: t.duration_days || 0,
+              totalBudget: Number(t.total_budget) || 0,
+              currency: t.currency || "INR",
+              travelStyle: t.travel_style || "",
+              groupType: t.group_type || "",
+              interests: t.interests || [],
+              status: t.status || "planning",
             })),
           );
         } else {
-          setError(data?.message || "Could not load trips.");
+          setTrips([]);
         }
       } catch (err) {
         console.error("Fetch trips failed:", err);
@@ -44,7 +55,7 @@ const Trips = () => {
     };
 
     fetchTrips();
-  }, []);
+  }, [session]);
 
   return (
     <div className="min-h-screen bg-gradient-light px-4 py-10">
@@ -82,4 +93,3 @@ const Trips = () => {
 };
 
 export default Trips;
-
