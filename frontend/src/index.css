@@ -21,9 +21,26 @@
     --color-alert-safety: #B33A3A;
     --color-alert-clear: #3A7D5C;
 
+    /* === NEW DASHBOARD REDESIGN PALETTE === */
+    --sand: #F5F0E8;
+    --sand-dark: #EDE6D8;
+    --ink: #1A1814;
+    --ink-light: #3D3A34;
+    --ink-muted: #7A7568;
+    --gold: #C8973A;
+    --gold-light: #F5D98B;
+    --gold-pale: #FBF2DC;
+    --teal: #2C7A6F;
+    --teal-light: #4AA89B;
+    --teal-pale: #D6EDE9;
+    --rose: #C05A5A;
+    --rose-pale: #F5E0E0;
+    --sky: #3A6AC8;
+    --sky-pale: #D6E2F5;
+
     /* === TYPOGRAPHY === */
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-ui: 'DM Sans', system-ui, sans-serif;
+    --font-display: 'Playfair Display', serif;
+    --font-ui: 'DM Sans', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
     /* === MOTION TOKENS === */
@@ -136,6 +153,33 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(232, 220, 200, 0.15);
+  }
+
+  /* === NEW DASHBOARD UTILITIES === */
+  @keyframes pulse { 
+    0%, 100% { opacity: 1; transform: scale(1); } 
+    50% { opacity: 0.5; transform: scale(0.8); } 
+  }
+
+  .cta-primary {
+    padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 500;
+    background: #C8973A; color: #1A1814; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .cta-primary:hover {
+    background: #F5D98B;
+  }
+
+  .cta-ghost {
+    padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 500;
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.12); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .cta-ghost:hover {
+    background: rgba(255,255,255,0.15);
   }
 }
 

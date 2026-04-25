@@ -44,19 +44,14 @@ export function TopBar({ onMenuToggle, mobileMenuOpen }: TopBarProps) {
       <PreferencesWizard />
       <PreferencesSlideOver open={isSlideOverOpen} onOpenChange={setIsSlideOverOpen} />
       <header 
-        className="flex h-16 shrink-0 items-center gap-4 px-4 md:px-6"
+        className="flex shrink-0 items-center gap-4 px-4 md:px-6"
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
+          height: "52px",
+          background: "var(--sand)",
+          borderBottom: "1px solid rgba(26,24,20,0.08)",
           zIndex: 100,
-          background: isScrolled ? "rgba(253,252,250,0.92)" : "transparent",
-          backdropFilter: isScrolled ? "blur(16px)" : "none",
-          WebkitBackdropFilter: isScrolled ? "blur(16px)" : "none",
-          boxShadow: isScrolled ? "0 1px 0 rgba(232,220,200,0.4)" : "none",
-          transition: "background 350ms ease, backdrop-filter 350ms ease, box-shadow 350ms ease",
-          color: isScrolled ? "#1A1A1A" : "rgba(247,245,240,0.85)",
+          position: "sticky",
+          top: 0
         }}
       >
       {/* Mobile menu button */}
@@ -74,28 +69,27 @@ export function TopBar({ onMenuToggle, mobileMenuOpen }: TopBarProps) {
       )}
       {/* Search - left side */}
       <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: "inherit", opacity: 0.7 }} />
+        <Search className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2" style={{ color: "var(--ink-muted)" }} />
         <Input
           placeholder="Search trips, flights, hotels..."
-          className="h-10 rounded-xl border-border bg-muted/50 pl-9 focus-visible:ring-2"
+          style={{ height: 36, borderRadius: 24, background: "var(--sand-dark)", border: "1px solid rgba(26,24,20,0.1)", paddingLeft: 36, fontSize: 13, color: "var(--ink)" }}
+          className="focus-visible:ring-1 focus-visible:ring-[#C8973A] shadow-none"
         />
       </div>
       {/* Notifications + Profile - top-right with spacing */}
       <div className="ml-auto flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full" style={{ color: "inherit" }}>
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" />
+        <Button variant="ghost" size="icon" style={{ height: 36, width: 36, borderRadius: "50%", background: "var(--sand-dark)", position: "relative" }}>
+          <Bell className="h-4 w-4" style={{ color: "var(--ink-light)" }} />
+          <span className="absolute right-2 top-2 h-2 w-2 rounded-full" style={{ background: "#C05A5A" }} />
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-10 w-10 rounded-full border-2 border-border">
-                <AvatarFallback className="bg-primary text-sm font-medium text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+            <Button variant="ghost" style={{ height: 36, width: 36, borderRadius: "50%", padding: 0, overflow: "hidden", position: "relative" }}>
+              <div className="flex h-full w-full items-center justify-center text-[11px] font-bold text-white" style={{ background: "linear-gradient(135deg, #C8973A, #A07020)" }}>
+                {initials}
+              </div>
               {showIncompleteBadge && (
-                <span className="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-500 border-2 border-background" />
+                <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-[var(--sand)]" />
               )}
             </Button>
           </DropdownMenuTrigger>
