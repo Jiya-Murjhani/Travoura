@@ -12,10 +12,11 @@ import GeneratedItinerary from "@/pages/GeneratedItinerary";
 import StartPlanning from "@/pages/startplanning";
 import ItineraryResults from "@/pages/ItineraryResults";
 import Dashboard from "@/pages/app/Dashboard";
-import Flights from "@/pages/app/Flights";
-import Hotels from "@/pages/app/Hotels";
+import Flights from "@/pages/Flights";
+import Hotels from "@/pages/Hotels";
 import Transport from "@/pages/app/Transport";
-import ActivitiesAndEvents from "@/pages/app/ActivitiesAndEvents";
+import ActivitiesAndEvents from "@/pages/ActivitiesAndEvents";
+import MyBookings from "@/pages/MyBookings";
 import AppItineraries from "@/pages/app/AppItineraries";
 import GuideBooking from "@/pages/app/GuideBooking";
 import AppBudgetTracker from "@/pages/app/AppBudgetTracker";
@@ -122,6 +123,7 @@ export const AppRoutes = () => {
           <Route path="hotels" element={<Hotels />} />
           <Route path="transport" element={<Transport />} />
           <Route path="activities" element={<ActivitiesAndEvents />} />
+          <Route path="bookings" element={<MyBookings />} />
           <Route path="itineraries" element={<AppItineraries />} />
           <Route path="guide-booking" element={<GuideBooking />} />
           <Route path="budget" element={<AppBudgetTracker />} />

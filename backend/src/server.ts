@@ -8,6 +8,7 @@ import itineraryRoutes from './routes/itinerary';
 import expenseRoutes from './routes/expenses';
 import preferencesRoutes from './routes/preferencesRoutes';
 import exploreRoutes from './routes/explore';
+import bookingRoutes from './routes/bookings';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -38,6 +39,7 @@ app.use('/api/trips', tripRoutes);
 app.use('/api/itinerary', itineraryRoutes);
 app.use('/api/preferences', preferencesRoutes);
 app.use('/api/explore', exploreRoutes);
+app.use('/api/bookings', authenticateToken, bookingRoutes);
 
 // Start server
 app.listen(PORT, () => {
