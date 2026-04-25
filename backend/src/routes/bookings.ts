@@ -57,82 +57,113 @@ router.post('/hotels/search', async (req, res) => {
 
 // ─── FLIGHTS ──────────────────────────────────────────
 router.post('/flights/search', async (req, res) => {
-  const { origin, destination, date } = req.body;
+  const { origin, destination, date, adults = 1 } = req.body;
   try {
-    // Because Skyscanner endpoints on RapidAPI are currently extremely unstable/removed,
-    // we return high-quality mock data so your frontend application continues to work flawlessly.
-    const flights = [
-      {
-        id: "mock-flight-1",
-        price: 450.50,
-        currency: 'USD',
-        priceFormatted: "$450.50",
-        airline: "Emirates",
-        airlineLogo: "https://logos.skyscnr.com/images/airlines/favicon/EK.png",
-        departure: `${date || '2026-06-01'}T10:00:00`,
-        arrival: `${date || '2026-06-01'}T14:30:00`,
-        duration: 270,
-        stops: 0,
-        origin: origin || "JFK",
-        destination: destination || "LHR",
-        deepLink: "https://www.skyscanner.com"
-      },
-      {
-        id: "mock-flight-2",
-        price: 320.00,
-        currency: 'USD',
-        priceFormatted: "$320.00",
-        airline: "British Airways",
-        airlineLogo: "https://logos.skyscnr.com/images/airlines/favicon/BA.png",
-        departure: `${date || '2026-06-01'}T15:00:00`,
-        arrival: `${date || '2026-06-01'}T22:15:00`,
-        duration: 435,
-        stops: 1,
-        origin: origin || "JFK",
-        destination: destination || "LHR",
-        deepLink: "https://www.skyscanner.com"
-      }
-    ];
+    const bHeaders = { 'X-RapidAPI-Key': RAPIDAPI_KEY, 'X-RapidAPI-Host': 'booking-com.p.rapidapi.com' };
+
+    // Step 1: resolve origin airport code
+    const [origRes, destRes] = await Promise.all([
+      fetch(`https://booking-com.p.rapidapi.com/v1/flights/locations?name=${encodeURIComponent(origin)}&locale=en-gb`, { headers: bHeaders }),
+      fetch(`https://booking-com.p.rapidapi.com/v1/flights/locations?name=${encodeURIComponent(destination)}&locale=en-gb`, { headers: bHeaders }),
+    ]);
+    const origData = await origRes.json() as any;
+    const destData = await destRes.json() as any;
+
+    // Prefer AIRPORT type, fall back to first result
+    const pickCode = (arr: any[]) => (arr.find((x: any) => x.type === 'AIRPORT') || arr[0])?.code;
+    const fromCode = pickCode(Array.isArray(origData) ? origData : []);
+    const toCode   = pickCode(Array.isArray(destData)  ? destData  : []);
+
+    if (!fromCode || !toCode) return res.json({ flights: [] });
+
+    // Step 2: search flights
+    const params = new URLSearchParams({
+      locale: 'en-gb', currency: 'USD', order_by: 'BEST',
+      flight_type: 'ONEWAY', cabin_class: 'ECONOMY',
+      from_code: fromCode, to_code: toCode,
+      depart_date: date, adults: adults.toString(),
+    });
+    const flightRes = await fetch(`https://booking-com.p.rapidapi.com/v1/flights/search?${params}`, { headers: bHeaders });
+    const flightData = await flightRes.json() as any;
+
+    const raw: any[] = flightData?.flightOffers || flightData?.aggregation?.stops?.flatMap((_: any) => []) || [];
+    // The real shape has flightOffers array
+    const offers: any[] = flightData?.flightOffers ?? [];
+    const flights = offers.slice(0, 20).map((o: any) => {
+      const seg = o.segments?.[0];
+      const leg = seg?.legs?.[0];
+      return {
+        id: o.token || leg?.departureAirport?.code + leg?.arrivalAirport?.code,
+        price: o.priceBreakdown?.total?.units ?? 0,
+        currency: o.priceBreakdown?.total?.currencyCode ?? 'USD',
+        priceFormatted: `$${o.priceBreakdown?.total?.units ?? 0}`,
+        airline: leg?.carriersData?.[0]?.name ?? 'Unknown',
+        airlineLogo: leg?.carriersData?.[0]?.logo ?? '',
+        departure: leg?.departureTime,
+        arrival: leg?.arrivalTime,
+        duration: seg?.totalTime ? Math.round(seg.totalTime / 60) : 0,
+        stops: (seg?.legs?.length ?? 1) - 1,
+        origin: leg?.departureAirport?.code,
+        destination: seg?.legs?.at(-1)?.arrivalAirport?.code,
+        deepLink: `https://www.booking.com/flights`,
+      };
+    });
     res.json({ flights });
   } catch (err) {
+    console.error('[flights]', err);
     res.status(500).json({ error: 'Flight search failed' });
   }
 });
 
 // ─── ACTIVITIES ───────────────────────────────────────
 router.post('/activities/search', async (req, res) => {
-  const { destination } = req.body;
+  const { destination, checkIn, checkOut } = req.body;
   try {
-    // Because Viator/Attractions endpoints on RapidAPI are currently unstable/removed,
-    // we return high-quality mock data so your frontend application continues to work flawlessly.
-    const activities = [
-      {
-        id: "mock-activity-1",
-        name: `Guided Tour of ${destination || 'the City'}`,
-        description: "Experience the best sights with a local guide. Perfect for first-time visitors.",
-        price: 85.00,
-        currency: 'USD',
-        image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=300",
-        rating: 4.8,
-        reviewCount: 124,
-        duration: "3 hours",
-        url: "https://www.booking.com/attractions"
-      },
-      {
-        id: "mock-activity-2",
-        name: `${destination || 'City'} Evening Food Tasting`,
-        description: "Taste local delicacies and explore hidden culinary gems.",
-        price: 120.00,
-        currency: 'USD',
-        image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300",
-        rating: 4.9,
-        reviewCount: 89,
-        duration: "4 hours",
-        url: "https://www.booking.com/attractions"
-      }
-    ];
+    const bHeaders = { 'X-RapidAPI-Key': RAPIDAPI_KEY, 'X-RapidAPI-Host': 'booking-com.p.rapidapi.com' };
+
+    // Step 1: get destination ID (reuse hotels locations endpoint)
+    const locRes = await fetch(
+      `https://booking-com.p.rapidapi.com/v1/hotels/locations?name=${encodeURIComponent(destination)}&locale=en-gb`,
+      { headers: bHeaders }
+    );
+    const locData = await locRes.json() as any;
+    const destId = locData[0]?.dest_id;
+    if (!destId) return res.json({ activities: [] });
+
+    // Step 2: search attractions using v2 endpoint
+    const startDate = checkIn || new Date().toISOString().split('T')[0];
+    const endDate   = checkOut || new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
+    const params = new URLSearchParams({
+      dest_id: destId,
+      locale: 'en-gb',
+      currency: 'USD',
+      order_by: 'SCORE',
+      start_date: startDate,
+      end_date: endDate,
+    });
+    const attRes = await fetch(
+      `https://booking-com.p.rapidapi.com/v2/attractions/search?${params}`,
+      { headers: bHeaders }
+    );
+    const attData = await attRes.json() as any;
+    console.log('[DEBUG] attractions keys:', Object.keys(attData));
+
+    const rawActs: any[] = attData?.products ?? attData?.attractions ?? attData?.data ?? [];
+    const activities = rawActs.slice(0, 20).map((a: any) => ({
+      id: a.id ?? a.productId,
+      name: a.name ?? a.title,
+      description: a.shortDescription ?? a.description ?? '',
+      price: a.representativePrice?.chargeAmount ?? a.price?.value ?? 0,
+      currency: a.representativePrice?.currency ?? a.price?.currency ?? 'USD',
+      image: a.primaryPhoto?.small ?? a.photos?.[0]?.small ?? '',
+      rating: a.reviewsStats?.combinedNumericStats?.average ?? a.rating ?? 0,
+      reviewCount: a.reviewsStats?.allReviewsCount ?? a.reviewCount ?? 0,
+      duration: a.durationRange?.upperDuration ? `${a.durationRange.upperDuration} min` : '',
+      url: `https://www.booking.com/attractions`,
+    }));
     res.json({ activities });
   } catch (err) {
+    console.error('[activities]', err);
     res.status(500).json({ error: 'Activity search failed' });
   }
 });
