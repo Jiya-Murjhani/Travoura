@@ -13,7 +13,7 @@ router.post('/hotels/search', async (req, res) => {
       `https://booking-com.p.rapidapi.com/v1/hotels/locations?name=${encodeURIComponent(destination)}&locale=en-gb`,
       { headers: { 'X-RapidAPI-Key': RAPIDAPI_KEY, 'X-RapidAPI-Host': 'booking-com.p.rapidapi.com' } }
     );
-    const locData = await locRes.json();
+    const locData = await locRes.json() as any;
     const destId = locData[0]?.dest_id;
     const destType = locData[0]?.dest_type;
     if (!destId) return res.json({ hotels: [] });
@@ -30,7 +30,7 @@ router.post('/hotels/search', async (req, res) => {
       `https://booking-com.p.rapidapi.com/v1/hotels/search?${params}`,
       { headers: { 'X-RapidAPI-Key': RAPIDAPI_KEY, 'X-RapidAPI-Host': 'booking-com.p.rapidapi.com' } }
     );
-    const hotData = await hotRes.json();
+    const hotData = await hotRes.json() as any;
     console.log("[DEBUG] hotData keys:", Object.keys(hotData));
     if (hotData.message) console.log("[DEBUG] API Message:", hotData.message);
     if (hotData.detail) console.log("[DEBUG] API Error Detail:", JSON.stringify(hotData.detail));
