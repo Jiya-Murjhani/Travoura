@@ -137,12 +137,12 @@ router.post('/activities/search', async (req, res) => {
       dest_id: destId,
       locale: 'en-gb',
       currency: 'USD',
-      order_by: 'SCORE',
+      order_by: 'attr_book_score',
       start_date: startDate,
       end_date: endDate,
     });
     const attRes = await fetch(
-      `https://booking-com.p.rapidapi.com/v2/attractions/search?${params}`,
+      `https://booking-com.p.rapidapi.com/v1/attractions/search?${params}`,
       { headers: bHeaders }
     );
     const attData = await attRes.json() as any;
