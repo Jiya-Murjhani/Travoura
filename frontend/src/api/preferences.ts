@@ -36,7 +36,7 @@ const getHeaders = async () => {
   };
 };
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api';
+const API_BASE = (import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5000') + '/api';
 
 export const getPreferences = async (userId: string): Promise<UserPreferences | null> => {
   const response = await fetch(`${API_BASE}/preferences/${userId}`, {
