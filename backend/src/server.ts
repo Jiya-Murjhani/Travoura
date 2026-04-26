@@ -9,6 +9,7 @@ import expenseRoutes from './routes/expenses';
 import preferencesRoutes from './routes/preferencesRoutes';
 import exploreRoutes from './routes/explore';
 import bookingRoutes from './routes/bookings';
+import parseTripIntentRoutes from './routes/parseTripIntent';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:5173',
+    'http://localhost:8080',
     'https://travoura-six.vercel.app', // your Vercel URL (update after deploy)
     process.env.FRONTEND_URL || ''
   ],
@@ -40,6 +42,7 @@ app.use('/api/itinerary', itineraryRoutes);
 app.use('/api/preferences', preferencesRoutes);
 app.use('/api/explore', exploreRoutes);
 app.use('/api/bookings', authenticateToken, bookingRoutes);
+app.use('/api/parse-trip-intent', parseTripIntentRoutes);
 
 // Start server
 app.listen(PORT, () => {

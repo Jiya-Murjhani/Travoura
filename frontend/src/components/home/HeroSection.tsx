@@ -4,6 +4,7 @@ import { useHeroScroll } from '@/hooks/useHeroScroll';
 interface HeroSectionProps {
   userName: string;
   onSearchSubmit: (query: string) => void;
+  isLoading?: boolean;
 }
 
 const QUICK_CHIPS = [
@@ -12,7 +13,7 @@ const QUICK_CHIPS = [
   { label: 'Weekend in Goa ✈' },
 ];
 
-const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit, isLoading = false }) => {
   const [loaded, setLoaded] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [inputFocused, setInputFocused] = useState(false);
@@ -33,14 +34,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit }) =
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchValue.trim()) {
+    if (searchValue.trim() && !isLoading) {
       onSearchSubmit(searchValue.trim());
     }
   };
 
   const handleChipClick = (text: string) => {
     setSearchValue(text);
-    inputRef.current?.focus();
+    if (!isLoading) {
+      onSearchSubmit(text);
+    }
   };
 
   /* Shared inline-style helper for staggered reveals */
@@ -69,6 +72,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit }) =
         <style>{`
           @media (min-width: 1024px) {
             #hero-image-panel { height: 100% !important; min-height: 100% !important; }
+          }
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
           }
         `}</style>
         <div id="hero-image-panel" className="relative w-full h-full overflow-hidden">
@@ -259,11 +266,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit }) =
                 onBlur={() => setInputFocused(false)}
                 placeholder="10 days in Japan under ₹1.5L..."
                 className="flex-1 bg-transparent outline-none min-w-0"
+                disabled={isLoading}
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '14px',
                   color: 'var(--color-text-primary)',
                   caretColor: 'var(--color-gold)',
+                  opacity: isLoading ? 0.6 : 1,
                 }}
               />
 
@@ -271,6 +280,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit }) =
               <button
                 type="submit"
                 className="flex-shrink-0 flex items-center justify-center mr-2 hover:opacity-90 active:scale-95"
+                disabled={isLoading}
                 style={{
                   width: '40px',
                   height: '40px',
@@ -278,24 +288,41 @@ const HeroSection: React.FC<HeroSectionProps> = ({ userName, onSearchSubmit }) =
                   background: 'var(--color-gold)',
                   color: '#FFFFFF',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
                   transition: 'opacity 200ms ease, transform 150ms ease',
+                  opacity: isLoading ? 0.7 : 1,
                 }}
                 aria-label="Submit search"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
+                {isLoading ? (
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ animation: 'spin 1s linear infinite' }}
+                  >
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                )}
               </button>
             </div>
           </form>

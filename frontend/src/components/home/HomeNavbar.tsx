@@ -1,38 +1,39 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import travouraLogo from '@/assets/travoura-logo.png';
 import './HomeNavbar.css';
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { label: 'Explore',       href: '/app/dashboard',  icon: '✦' },
-  { label: 'Flights',       href: '/app/flights',     icon: null },
-  { label: 'Hotels & Stays',href: '/app/hotels',      icon: null },
-  { label: 'Things To Do',  href: '/app/activities',  icon: null },
-  { label: 'Travel Guides', href: '/app/guide-booking',icon: null },
+  { label: 'Explore', href: '/app/dashboard', icon: '✦' },
+  { label: 'Flights', href: '/app/flights', icon: null },
+  { label: 'Hotels & Stays', href: '/app/hotels', icon: null },
+  { label: 'Things To Do', href: '/app/activities', icon: null },
+  { label: 'Travel Guides', href: '/app/guide-booking', icon: null },
 ];
 
 const COUNTRIES = [
-  { code: 'IN', name: 'India',          flag: '🇮🇳', currency: 'INR', symbol: '₹'  },
-  { code: 'US', name: 'United States',  flag: '🇺🇸', currency: 'USD', symbol: '$'  },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£'  },
-  { code: 'AE', name: 'UAE',            flag: '🇦🇪', currency: 'AED', symbol: 'د.إ'},
-  { code: 'SG', name: 'Singapore',      flag: '🇸🇬', currency: 'SGD', symbol: 'S$' },
-  { code: 'JP', name: 'Japan',          flag: '🇯🇵', currency: 'JPY', symbol: '¥'  },
-  { code: 'EU', name: 'Europe',         flag: '🇪🇺', currency: 'EUR', symbol: '€'  },
-  { code: 'AU', name: 'Australia',      flag: '🇦🇺', currency: 'AUD', symbol: 'A$' },
+  { code: 'IN', name: 'India', flag: '🇮🇳', currency: 'INR', symbol: '₹' },
+  { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', symbol: '£' },
+  { code: 'AE', name: 'UAE', flag: '🇦🇪', currency: 'AED', symbol: 'د.إ' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬', currency: 'SGD', symbol: 'S$' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵', currency: 'JPY', symbol: '¥' },
+  { code: 'EU', name: 'Europe', flag: '🇪🇺', currency: 'EUR', symbol: '€' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', symbol: 'A$' },
 ];
 
 const CURRENCIES = [
-  { code: 'INR', symbol: '₹',   name: 'Indian Rupee'   },
-  { code: 'USD', symbol: '$',   name: 'US Dollar'       },
-  { code: 'EUR', symbol: '€',   name: 'Euro'            },
-  { code: 'GBP', symbol: '£',   name: 'British Pound'   },
-  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham'      },
-  { code: 'SGD', symbol: 'S$',  name: 'Singapore Dollar'},
-  { code: 'JPY', symbol: '¥',   name: 'Japanese Yen'    },
-  { code: 'AUD', symbol: 'A$',  name: 'Australian Dollar'},
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
 ];
 
 // ─── Logo SVG ─────────────────────────────────────────────────────────────────
@@ -40,38 +41,21 @@ const CURRENCIES = [
 // by two crossing lines and four cardinal tick marks. Pure SVG, no images.
 
 const TravouraLogoMark: React.FC<{ scrolled: boolean }> = ({ scrolled }) => {
-  const accent = '#C9A84C';
-  const fill   = scrolled ? '#1A1A1A' : '#FDFCFA';
   return (
-    <svg
+    <img
+      src={travouraLogo}
+      alt="Travoura logo"
       className="tnav-logo-icon"
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-label="Travoura logo mark"
-    >
-      {/* Outer ring */}
-      <circle cx="16" cy="16" r="14.5" stroke={accent} strokeWidth="1" opacity="0.6" />
-      {/* Inner ring */}
-      <circle cx="16" cy="16" r="10" stroke={fill} strokeWidth="0.75" opacity="0.3" />
-      {/* Cardinal tick marks (N S E W) */}
-      <line x1="16" y1="1"  x2="16" y2="5"  stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="16" y1="27" x2="16" y2="31" stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="1"  y1="16" x2="5"  y2="16" stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="27" y1="16" x2="31" y2="16" stroke={accent} strokeWidth="1.5" strokeLinecap="round" />
-      {/* Diagonal ticks */}
-      <line x1="5.5"  y1="5.5"  x2="7.7"  y2="7.7"  stroke={fill} strokeWidth="0.75" strokeLinecap="round" opacity="0.4" />
-      <line x1="24.3" y1="24.3" x2="26.5" y2="26.5" stroke={fill} strokeWidth="0.75" strokeLinecap="round" opacity="0.4" />
-      <line x1="26.5" y1="5.5"  x2="24.3" y2="7.7"  stroke={fill} strokeWidth="0.75" strokeLinecap="round" opacity="0.4" />
-      <line x1="7.7"  y1="24.3" x2="5.5"  y2="26.5" stroke={fill} strokeWidth="0.75" strokeLinecap="round" opacity="0.4" />
-      {/* Centre diamond (the "north star" focal point) */}
-      <path
-        d="M16 11 L18 16 L16 21 L14 16 Z"
-        fill={accent}
-        opacity="0.9"
-      />
-      <circle cx="16" cy="16" r="2" fill={fill} />
-    </svg>
+      style={{
+        height: '180px', // Increased height to accommodate the full logo
+        width: 'auto',
+        objectFit: 'contain',
+        // Since we changed transparent navbar text to dark, we don't invert the logo anymore.
+        filter: 'none',
+        transition: 'filter 350ms ease',
+        transform: 'translateY(-2px)' // slight visual adjustment
+      }}
+    />
   );
 };
 
@@ -98,8 +82,8 @@ const ChevronDown: React.FC<{ open?: boolean; size?: number }> = ({ open, size =
 const BellIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
   </svg>
 );
 
@@ -123,8 +107,8 @@ function useOutsideClick(
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const HomeNavbar: React.FC = () => {
-  const navigate  = useNavigate();
-  const location  = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user, signOut } = useAuth();
 
   // ── Scroll state ──
@@ -137,18 +121,18 @@ const HomeNavbar: React.FC = () => {
   }, []);
 
   // ── Dropdown open states ──
-  const [avatarOpen,   setAvatarOpen]   = useState(false);
-  const [countryOpen,  setCountryOpen]  = useState(false);
+  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [mobileOpen,   setMobileOpen]   = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // ── Selector values ──
-  const [selectedCountry,  setSelectedCountry]  = useState(COUNTRIES[0]);
+  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [selectedCurrency, setSelectedCurrency] = useState(CURRENCIES[0]);
 
   // ── Refs for outside click detection ──
-  const avatarRef   = useRef<HTMLDivElement>(null);
-  const countryRef  = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLDivElement>(null);
+  const countryRef = useRef<HTMLDivElement>(null);
   const currencyRef = useRef<HTMLDivElement>(null);
 
   const closeAll = useCallback(() => {
@@ -165,9 +149,9 @@ const HomeNavbar: React.FC = () => {
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   // ── User info ──
-  const userName  = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Traveller';
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Traveller';
   const userEmail = user?.email || '';
-  const initials  = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+  const initials = userName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
   const handleSignOut = async () => {
     await signOut();
@@ -298,7 +282,7 @@ const HomeNavbar: React.FC = () => {
               <div className="tnav-divider" />
               <span style={{
                 fontFamily: 'DM Sans, system-ui, sans-serif',
-                fontSize: 12, color: 'rgba(253,252,250,0.55)',
+                fontSize: 12, color: '#6B6560',
                 transition: 'color 350ms ease',
               }}
                 className={scrolled ? '' : ''}
@@ -322,7 +306,6 @@ const HomeNavbar: React.FC = () => {
             aria-label="Go to Travoura home"
           >
             <TravouraLogoMark scrolled={scrolled} />
-            <span className="tnav-logo-word">Travoura</span>
           </button>
 
           {/* Nav links — centered via absolute position in CSS */}
@@ -387,10 +370,10 @@ const HomeNavbar: React.FC = () => {
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="3" width="7" height="7" rx="1"/>
-                        <rect x="14" y="3" width="7" height="7" rx="1"/>
-                        <rect x="3" y="14" width="7" height="7" rx="1"/>
-                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
                       </svg>
                       My Dashboard
                     </button>
@@ -403,8 +386,8 @@ const HomeNavbar: React.FC = () => {
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
                       </svg>
                       My Trips
                     </button>
@@ -417,7 +400,7 @@ const HomeNavbar: React.FC = () => {
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
                       AI Itineraries
                     </button>
@@ -430,8 +413,8 @@ const HomeNavbar: React.FC = () => {
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        <line x1="12" y1="1" x2="12" y2="23" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                       </svg>
                       Budget Tracker
                     </button>
@@ -446,8 +429,8 @@ const HomeNavbar: React.FC = () => {
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                       </svg>
                       Preferences & Settings
                     </button>
@@ -460,9 +443,9 @@ const HomeNavbar: React.FC = () => {
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
                       </svg>
                       Sign Out
                     </button>
@@ -499,7 +482,7 @@ const HomeNavbar: React.FC = () => {
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth={1.8} strokeLinecap="round">
-                <line x1="3" y1="7"  x2="21" y2="7"  />
+                <line x1="3" y1="7" x2="21" y2="7" />
                 <line x1="3" y1="12" x2="21" y2="12" />
                 <line x1="3" y1="17" x2="17" y2="17" />
               </svg>
@@ -517,17 +500,14 @@ const HomeNavbar: React.FC = () => {
             <button className="tnav-mobile-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth={2} strokeLinecap="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6"  y1="6" x2="18" y2="18"/>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
 
             {/* Logo in drawer */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24, paddingLeft: 4 }}>
               <TravouraLogoMark scrolled={true} />
-              <span style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>
-                Travoura
-              </span>
             </div>
 
             {/* Nav links */}

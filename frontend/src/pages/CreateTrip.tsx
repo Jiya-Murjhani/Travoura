@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronRight, Plus, Minus, Loader2, Info, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft, ChevronRight, Plus, Minus, Loader2, Info, X, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -190,37 +190,107 @@ interface TripFormData {
 
 const CreateTrip = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { session } = useAuth();
+
+  // ── Prefill from hero search ─────────────────────────────── 
+  const prefill = (location.state as any)?.prefill;
+
+  const buildInitialFormData = (): TripFormData => {
+    const defaults: TripFormData = {
+      title: "",
+      country: "",
+      destination: "",
+      start_date: "",
+      end_date: "",
+      duration_days: 0,
+      num_travelers: 1,
+      group_type: "",
+      total_budget: "",
+      currency: "USD",
+      budget_tier: "",
+      trip_type: [],
+      interests: [],
+      pace: 3,
+      accommodation_type: [],
+      transport_pref: [],
+      dietary_needs: [],
+      accessibility_notes: "",
+      notes: "",
+    };
+
+    if (!prefill) return defaults;
+
+    // Map prefill fields to form fields (only if non-null)
+    if (prefill.destination) defaults.destination = prefill.destination;
+    if (prefill.country) {
+      // Try to match a country from the COUNTRIES list
+      const match = COUNTRIES.find(c => c.toLowerCase().includes(prefill.country.toLowerCase()));
+      defaults.country = match || prefill.country;
+    }
+    if (prefill.duration_days != null) defaults.duration_days = prefill.duration_days;
+    if (prefill.total_budget != null) defaults.total_budget = prefill.total_budget;
+    if (prefill.currency) {
+      const currMatch = CURRENCIES.find(c => c.code === prefill.currency.toUpperCase());
+      if (currMatch) defaults.currency = currMatch.code;
+    }
+    if (prefill.num_travelers != null) defaults.num_travelers = prefill.num_travelers;
+    if (prefill.group_type) {
+      const gtMatch = GROUP_TYPE_OPTIONS.find(o => o.value === prefill.group_type);
+      if (gtMatch) defaults.group_type = gtMatch.value;
+    }
+    if (Array.isArray(prefill.interests) && prefill.interests.length > 0) {
+      // Match against known interests (case-insensitive) or add as custom
+      defaults.interests = prefill.interests.map((i: string) => {
+        const known = INTEREST_OPTIONS.find(opt => opt.toLowerCase() === i.toLowerCase());
+        return known || i;
+      });
+    }
+    if (prefill.budget_tier) {
+      const btMatch = BUDGET_TIER_OPTIONS.find(o => o.value === prefill.budget_tier);
+      if (btMatch) defaults.budget_tier = btMatch.value;
+    }
+    if (prefill.pace) {
+      const paceMap: Record<string, number> = { 'relaxed': 1, 'moderate': 3, 'fast-paced': 5 };
+      const paceVal = paceMap[prefill.pace.toLowerCase()];
+      if (paceVal) defaults.pace = paceVal;
+    }
+    if (Array.isArray(prefill.trip_type) && prefill.trip_type.length > 0) {
+      defaults.trip_type = prefill.trip_type.filter((t: string) =>
+        TRIP_TYPE_OPTIONS.some(o => o.value === t)
+      );
+    }
+    if (Array.isArray(prefill.dietary_needs) && prefill.dietary_needs.length > 0) {
+      defaults.dietary_needs = prefill.dietary_needs.filter((d: string) =>
+        DIETARY_OPTIONS.some(o => o.toLowerCase() === d.toLowerCase())
+      ).map((d: string) => {
+        const match = DIETARY_OPTIONS.find(o => o.toLowerCase() === d.toLowerCase());
+        return match || d;
+      });
+    }
+    if (prefill.notes) defaults.notes = prefill.notes;
+
+    return defaults;
+  };
 
   /* ── state ────────────────────────────────────────────────── */
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<TripFormData>({
-    title: "",
-    country: "",
-    destination: "",
-    start_date: "",
-    end_date: "",
-    duration_days: 0,
-    num_travelers: 1,
-    group_type: "",
-    total_budget: "",
-    currency: "USD",
-    budget_tier: "",
-    trip_type: [],
-    interests: [],
-    pace: 3,
-    accommodation_type: [],
-    transport_pref: [],
-    dietary_needs: [],
-    accessibility_notes: "",
-    notes: "",
-  });
+  const [formData, setFormData] = useState<TripFormData>(buildInitialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [customInterest, setCustomInterest] = useState("");
+  const [showPrefillBanner, setShowPrefillBanner] = useState(!!prefill);
 
   const today = new Date().toISOString().split("T")[0];
+
+  /* ── auto-dismiss prefill banner ──────────────────────── */
+  useEffect(() => {
+    if (showPrefillBanner) {
+      const timer = setTimeout(() => setShowPrefillBanner(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPrefillBanner]);
 
   /* ── auto-compute duration ────────────────────────────────── */
   useEffect(() => {
@@ -786,6 +856,21 @@ const CreateTrip = () => {
         {/* ── Content area ───────────────────────────────────── */}
         <main className="flex-1 pb-28 md:pb-10">
           <div className="max-w-[680px] mx-auto px-6 py-8">
+            {/* Prefill success banner */}
+            {showPrefillBanner && (
+              <div className="mb-6 flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl animate-pulse"
+                style={{ animation: 'fadeSlideUp 0.3s ease-out forwards' }}
+              >
+                <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                <span className="text-emerald-700 text-sm font-medium">
+                  ✈ Trip details pre-filled from your prompt
+                </span>
+                <button onClick={() => setShowPrefillBanner(false)} className="ml-auto text-emerald-400 hover:text-emerald-600">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             {/* API error banner */}
             {apiError && (
               <div className="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
