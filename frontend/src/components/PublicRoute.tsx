@@ -2,25 +2,19 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import type { Session } from "@supabase/supabase-js";
+import { Loader2 } from "lucide-react";
 
-interface ProtectedRouteProps {
+interface PublicRouteProps {
   children: React.ReactNode;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function PublicRoute({ children }: PublicRouteProps) {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    console.info("[AuthFlow] ProtectedRoute check", { path: location.pathname });
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.info("[AuthFlow] ProtectedRoute session result", {
-        path: location.pathname,
-        hasSession: !!session,
-        userId: session?.user?.id ?? null,
-        emailConfirmedAt: session?.user?.email_confirmed_at ?? null,
-      });
       setSession(session);
       setLoading(false);
     });
@@ -29,13 +23,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--app-bg-primary)]">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--app-accent-primary)] border-t-transparent" />
+        <Loader2 className="h-6 w-6 animate-spin text-[var(--app-accent-primary)]" />
       </div>
     );
   }
 
-  if (!session) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (session) {
+    return <Navigate to="/app" replace />;
   }
 
   return <>{children}</>;

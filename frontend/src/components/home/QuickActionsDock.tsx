@@ -29,7 +29,7 @@ export const QuickActionsDock = () => {
                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${action.color.split(' ')[0]} mix-blend-multiply`} />
                   
                   <div className={`relative z-10 h-16 w-16 rounded-2xl ${action.color} flex items-center justify-center transition-all duration-500 shadow-inner`}>
-                    <Icon className={`h-8 w-8 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${action.groupClass}`} />
+                    <Icon className={`h-8 w-8 transition-all duration-500 ${action.groupClass}`} style={{ transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1)" }} />
                   </div>
                   
                   <span className="relative z-10 font-bold text-gray-900 transition-colors group-hover:text-gray-900">

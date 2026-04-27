@@ -54,17 +54,20 @@ const Login = () => {
         <div className="max-w-md mx-auto animate-fade-in">
           <Card className="shadow-elevated border-border/50 bg-card/95 backdrop-blur-sm">
             <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-3xl font-display font-bold text-foreground">
+              <div className="flex justify-center mb-2">
+                <Plane className="w-10 h-10 text-[#8b78dd]" />
+              </div>
+              <CardTitle className="text-3xl font-display font-bold text-[#8b78dd]">
                 Welcome Back
               </CardTitle>
-              <CardDescription className="text-base">
+              <CardDescription className="text-base text-gray-50">
                 Sign in to continue your travel journey
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-50">
                       <Mail className="w-4 h-4 text-primary" />
                       Email Address
                     </label>
@@ -78,7 +81,7 @@ const Login = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-50">
                       <Lock className="w-4 h-4 text-primary" />
                       Password
                     </label>
@@ -93,7 +96,7 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-50 transition-colors"
                       >
                         {showPassword ? (
                           <EyeOff className="w-5 h-5" />
@@ -110,7 +113,7 @@ const Login = () => {
                         type="checkbox"
                         className="rounded border-border text-primary focus:ring-primary"
                       />
-                      <span className="text-muted-foreground">Remember me</span>
+                      <span className="text-gray-50">Remember me</span>
                     </label>
                     <Link
                       to="/forgot-password"
@@ -127,7 +130,7 @@ const Login = () => {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 text-base font-semibold bg-gradient-ocean hover:opacity-90 transition-opacity"
+                    className="w-full h-12 text-base font-semibold bg-gradient-ocean hover:opacity-90 transition-opacity text-[#8b78dd]"
                     size="lg"
                   >
                     Sign In
@@ -141,13 +144,13 @@ const Login = () => {
                     <span className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
+                    <span className="bg-card px-2 text-gray-50">
                       Or continue with
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-6 grid grid-cols-2 gap-3">
+                <div className="mt-6 grid grid-cols-2 gap-3 text-gray-50">
                   <Button
                     type="button"
                     variant="outline"
@@ -187,7 +190,7 @@ const Login = () => {
               </div>
 
               <div className="mt-6 text-center text-sm">
-                <span className="text-muted-foreground">Don't have an account? </span>
+                <span className="text-gray-50">Don't have an account? </span>
                 <Link
                   to="/signup"
                   className="text-primary hover:text-secondary transition-colors font-semibold"
@@ -202,7 +205,7 @@ const Login = () => {
           <div className="mt-6 text-center">
             <Link
               to="/"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+              className="text-sm text-gray-50 hover:text-white transition-colors inline-flex items-center gap-1"
             >
               <ArrowRight className="w-4 h-4 rotate-180" />
               Back to home

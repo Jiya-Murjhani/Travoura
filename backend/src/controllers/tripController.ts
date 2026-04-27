@@ -170,7 +170,7 @@ export const getUserTrips = async (req: AuthRequest, res: Response) => {
 
     const userSupabase = getUserSupabase(req);
 
-    const { data: result, error } = await userSupabase
+    const { data, error } = await userSupabase
       .from('trips')
       .select('*')
       .eq('user_id', userId)
@@ -181,25 +181,10 @@ export const getUserTrips = async (req: AuthRequest, res: Response) => {
       return res.status(500).json({ message: 'Failed to fetch trips', success: false });
     }
 
-    const trips = (result || []).map((trip: any) => ({
-      id: trip.trip_id || trip.id,
-      trip_id: trip.trip_id || trip.id,
-      user_id: trip.user_id,
-      destination: trip.destination,
-      startDate: trip.start_date,
-      endDate: trip.end_date,
-      budget: Number(trip.budget),
-      created_at: trip.created_at,
-    }));
-
-    res.status(200).json({
-      success: true,
-      trips,
-    });
-
+    return res.json(data || []);
   } catch (error) {
     console.error('Fetch trips error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       message: 'Failed to fetch trips',
       success: false,
     });

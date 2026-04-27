@@ -58,8 +58,9 @@ export default function DestinationDrawer({
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[480px] max-w-full bg-white shadow-2xl overflow-y-auto transition-transform duration-[320ms]`}
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[480px] max-w-full bg-white shadow-2xl overflow-y-auto transition-transform`}
         style={{
+          transitionDuration: "320ms",
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)',
         }}

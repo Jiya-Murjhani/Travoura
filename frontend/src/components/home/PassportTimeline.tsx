@@ -33,8 +33,8 @@ export const PassportTimeline = () => {
                  
                  {/* The Stamp Card */}
                  <div 
-                   className={`w-[85%] md:w-[40%] transition-all duration-[800ms] ease-[cubic-bezier(0.175,0.885,0.32,1.275)] ${isVisible ? `opacity-100 ${trip.rotate} translate-y-0` : 'opacity-0 translate-y-12 rotate-[-10deg]'}`}
-                   style={{ transitionDelay: `${i * 200}ms` }}
+                   className={`w-[85%] md:w-[40%] transition-all ${isVisible ? `opacity-100 ${trip.rotate} translate-y-0` : 'opacity-0 translate-y-12 rotate-[-10deg]'}`}
+                   style={{ transitionDuration: "800ms", transitionTimingFunction: "cubic-bezier(0.175,0.885,0.32,1.275)", transitionDelay: `${i * 200}ms` }}
                  >
                    <div className={`p-6 bg-white rounded-2xl shadow-lg border border-gray-100 text-left ${trip.grayscale ? 'grayscale opacity-75' : ''}`}>
                      <div className="flex justify-between items-start mb-4">

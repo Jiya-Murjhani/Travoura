@@ -48,6 +48,7 @@ export const usePreferences = () => {
   });
 
   return {
+    data: query.data,
     preferences: query.data,
     isLoading: query.isLoading,
     error: query.error,

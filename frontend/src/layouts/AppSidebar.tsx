@@ -17,6 +17,7 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeft,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -73,27 +74,27 @@ export function AppSidebar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "flex items-center gap-3 rounded-lg px-3 py-[9px] text-[13px] font-medium transition-colors duration-150",
+      "flex items-center gap-3 rounded-lg px-3 py-[9px] text-[13px] font-medium transition-colors duration-150 border-l-2",
       isActive
-        ? "bg-[rgba(200,151,58,0.15)] text-[#C8973A]"
-        : "text-[#C8C0B0] hover:bg-[rgba(255,255,255,0.06)]"
+        ? "bg-[var(--app-accent-soft)] text-[var(--app-accent-primary)] border-[var(--app-accent-primary)]"
+        : "text-[var(--app-text-secondary)] border-transparent hover:bg-[var(--app-accent-glow)] hover:text-[var(--app-accent-light)] hover:border-[var(--app-accent-primary)]"
     );
 
   return (
     <aside 
       className={cn(
-        "flex h-full flex-col overflow-hidden transition-[width] duration-300 ease-in-out shrink-0 border-r border-[rgba(255,255,255,0.04)]",
+        "flex h-full flex-col overflow-hidden transition-[width] duration-300 ease-in-out shrink-0",
         collapsed ? "w-[60px]" : "w-[220px]"
       )}
-      style={{ background: "#1A1814" }}
+      style={{ background: "var(--app-bg-primary)", borderRight: "0.5px solid var(--app-border-default)" }}
     >
       {/* Logo + Toggle */}
-      <div className="flex shrink-0 items-center border-b border-[rgba(255,255,255,0.07)] px-4 py-5" style={{ minHeight: "80px" }}>
+      <div className="flex shrink-0 items-center border-b px-4 py-5" style={{ minHeight: "80px", borderColor: "var(--app-border-default)" }}>
         {collapsed ? (
           <div className="flex w-full flex-col items-center gap-4">
             <NavLink
               to="/app/dashboard"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#C8973A] transition-transform duration-200 hover:scale-105 bg-[rgba(200,151,58,0.15)]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--app-accent-primary)] transition-transform duration-200 hover:scale-105 bg-[var(--app-accent-soft)]"
             >
               <Plane className="h-4 w-4" />
             </NavLink>
@@ -102,12 +103,12 @@ export function AppSidebar() {
         ) : (
           <div className="flex flex-1 flex-col">
             <div className="flex items-center justify-between">
-              <NavLink to="/app/dashboard" className="flex items-center gap-2 overflow-hidden" style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: "white", fontWeight: 700 }}>
-                Trav<span style={{ color: "#C8973A" }}>o</span>ura
+              <NavLink to="/app/dashboard" className="flex items-center gap-2 overflow-hidden" style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: "var(--app-text-primary)", fontWeight: 700 }}>
+                Trav<span style={{ color: "var(--app-accent-primary)" }}>o</span>ura
               </NavLink>
               <SidebarToggleButton />
             </div>
-            <p style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--gold-muted)", marginTop: 4 }}>
+            <p style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--app-text-tertiary)", marginTop: 4 }}>
               Your journey, perfected
             </p>
           </div>
@@ -160,11 +161,37 @@ export function AppSidebar() {
         </TooltipProvider>
       </ScrollArea>
 
+      {/* New Trip Button */}
+      <div className="shrink-0 p-4 pt-0">
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => navigate("/create-trip")}
+                className={cn(
+                  "flex items-center justify-center rounded-[4px] bg-[var(--app-accent-primary)] text-[#0f0e17] transition-all hover:bg-[var(--app-accent-light)] font-semibold",
+                  collapsed ? "h-10 w-10 mx-auto rounded-full" : "w-full py-2.5 px-4 gap-2"
+                )}
+                style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, letterSpacing: "0.06em", textTransform: "uppercase" }}
+              >
+                <Plus className="h-4 w-4 shrink-0" />
+                {!collapsed && <span>New Trip</span>}
+              </button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right" className="rounded-lg">
+                New Trip
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
       {/* User Footer */}
-      <div className="shrink-0 border-t p-4" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+      <div className="shrink-0 border-t p-4" style={{ borderColor: "var(--app-border-default)" }}>
         {collapsed ? (
           <div className="flex flex-col items-center gap-4">
-            <div className="h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm" style={{ background: "linear-gradient(135deg, #C8973A, #A07020)" }}>
+            <div className="h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold text-[var(--app-accent-light)] shadow-sm border border-[var(--app-border-hover)]" style={{ background: "var(--app-accent-soft)" }}>
               {initials}
             </div>
             <TooltipProvider delayDuration={0}>
@@ -173,7 +200,7 @@ export function AppSidebar() {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex justify-center rounded-lg p-2 text-[#C8C0B0] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-white"
+                    className="flex justify-center rounded-lg p-2 text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-accent-glow)] hover:text-[var(--app-accent-light)]"
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
@@ -187,18 +214,18 @@ export function AppSidebar() {
         ) : (
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm" style={{ background: "linear-gradient(135deg, #C8973A, #A07020)" }}>
+              <div className="h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-[var(--app-accent-light)] shadow-sm border border-[var(--app-border-hover)]" style={{ background: "var(--app-accent-soft)" }}>
                 {initials}
               </div>
               <div className="flex flex-col overflow-hidden">
-                <span className="truncate text-[13px] font-semibold text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>{displayName}</span>
-                <span className="truncate text-[11px] text-[#C8C0B0]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Pro traveller</span>
+                <span className="truncate text-[13px] font-semibold text-[var(--app-text-primary)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{displayName}</span>
+                <span className="truncate text-[11px] text-[var(--app-text-secondary)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Pro traveller</span>
               </div>
             </div>
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[12px] font-medium text-[#C8C0B0] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-white"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[12px] font-medium text-[var(--app-text-secondary)] transition-colors hover:bg-[var(--app-accent-glow)] hover:text-[var(--app-accent-light)]"
             >
               <LogOut className="h-4 w-4 shrink-0" />
               <span style={{ fontFamily: "'DM Sans', sans-serif" }}>Logout</span>

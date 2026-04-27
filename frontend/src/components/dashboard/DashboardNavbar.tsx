@@ -16,13 +16,13 @@ export function DashboardNavbar() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Plane className="h-7 w-7 text-primary" />
-            <span className="text-xl font-semibold tracking-tight">Travoura</span>
+            <Plane className="h-7 w-7 text-[#8b78dd]" />
+            <span className="text-xl font-semibold tracking-tight text-[#8b78dd]">Travoura</span>
           </Link>
 
           <div className="flex items-center gap-3">
             <Link to="/itineraries/new">
-              <Button variant="secondary" className="hidden sm:inline-flex">
+              <Button variant="secondary" className="hidden sm:inline-flex text-[#8b78dd]">
                 Create itinerary
               </Button>
             </Link>

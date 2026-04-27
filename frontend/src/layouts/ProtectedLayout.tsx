@@ -15,7 +15,7 @@ function ProtectedLayoutContent() {
   const isHomePage = location.pathname === '/home';
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
+    <div className="flex min-h-screen bg-[var(--app-bg-primary)] text-[var(--app-text-primary)]">
       {/* Fixed full-height collapsible sidebar - desktop only */}
       {!isHomePage && (
         <div
@@ -39,7 +39,7 @@ function ProtectedLayoutContent() {
               mobileMenuOpen={mobileMenuOpen}
             />
           )}
-          <main className="flex-1 overflow-auto bg-gradient-to-b from-muted/40 via-muted/20 to-background" style={{ paddingTop: isHomePage ? 0 : undefined }}>
+          <main className="flex-1 overflow-auto" style={{ paddingTop: isHomePage ? 0 : undefined }}>
             <Outlet />
           </main>
         </div>

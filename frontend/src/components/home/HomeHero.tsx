@@ -12,7 +12,8 @@ export const HomeHero = () => {
         autoPlay 
         muted 
         loop 
-        className="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-overlay animate-in zoom-in duration-[10000ms] fill-mode-forwards ease-linear"
+        className="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-overlay animate-in zoom-in fill-mode-forwards ease-linear"
+        style={{ animationDuration: "10000ms" }}
       >
         {/* Placeholder cinematic aerial footage */}
         <source src="https://cdn.pixabay.com/video/2022/01/18/104332-666324269_large.mp4" type="video/mp4" />

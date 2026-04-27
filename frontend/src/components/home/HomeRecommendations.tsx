@@ -53,8 +53,8 @@ export const HomeRecommendations = () => {
           {RECOMMENDATIONS.map((rec, idx) => (
             <div 
               key={idx}
-              className={`group relative flex-none w-[280px] md:w-[320px] h-[400px] md:h-[440px] rounded-3xl overflow-hidden shadow-xl cursor-pointer bg-white transition-all duration-[1200ms] ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-24'}`}
-              style={{ scrollSnapAlign: 'start', transitionDelay: `${idx * 150}ms` }}
+              className={`group relative flex-none w-[280px] md:w-[320px] h-[400px] md:h-[440px] rounded-3xl overflow-hidden shadow-xl cursor-pointer bg-white transition-all ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-24'}`}
+              style={{ transitionDuration: "1200ms", scrollSnapAlign: 'start', transitionDelay: `${idx * 150}ms` }}
             >
               <div className="absolute inset-0 overflow-hidden bg-gray-200">
                 <img 

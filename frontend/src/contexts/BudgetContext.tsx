@@ -75,8 +75,21 @@ export const BudgetProvider = ({ children }: { children: ReactNode }) => {
     spent: 0,
     categories: defaultCategories,
   });
+  const [isAuthReady, setIsAuthReady] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setIsAuthReady(!!data.session));
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setIsAuthReady(!!session);
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
   const loadData = useCallback(async () => {
+    if (!isAuthReady) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -132,7 +145,7 @@ export const BudgetProvider = ({ children }: { children: ReactNode }) => {
         allocated: Math.floor(Number(totalAllocated) * (catRatios[c.name] || 0.1))
       }))
     }));
-  }, []);
+  }, [isAuthReady]);
 
   useEffect(() => {
     loadData();

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PublicRoute } from "@/components/PublicRoute";
 import { ProtectedLayout } from "@/layouts/ProtectedLayout";
 import Index from "@/pages/Index";
 import BudgetTracker from "@/pages/BudgetTracker";
@@ -24,7 +25,6 @@ import RealTimeUpdates from "@/pages/app/RealTimeUpdates";
 import SafetyAlerts from "@/pages/app/SafetyAlerts";
 import Settings from "@/pages/app/Settings";
 import NotFound from "@/pages/NotFound";
-import Home from "@/pages/Home";
 import CreateTrip from "@/pages/CreateTrip";
 import Trips from "@/pages/Trips";
 import TripDashboard from "@/pages/TripDashboard";
@@ -35,20 +35,12 @@ export const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
         <Route path="/budget" element={<BudgetTracker />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
 
         {/* Trip-based workflow (protected) */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/create-trip"
           element={

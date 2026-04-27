@@ -48,7 +48,7 @@ export default function ItineraryView() {
         <div className="mb-6">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-[#8b78dd] hover:text-[#8b78dd]/80 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -89,10 +89,10 @@ export default function ItineraryView() {
             {/* Header with destination and back button */}
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-[#8b78dd]">
                   {itinerary.destination}
                 </h1>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-[#8b78dd] mt-1">
                   {new Date(itinerary.start_date).toLocaleDateString()} -{" "}
                   {new Date(itinerary.end_date).toLocaleDateString()}
                 </p>
@@ -101,7 +101,7 @@ export default function ItineraryView() {
                 <Button
                   onClick={() => navigate(`/trip/${itinerary.trip_id}`)}
                   variant="outline"
-                  className="gap-2"
+                  className="gap-2 text-[#8b78dd] border-[#8b78dd] hover:bg-[#8b78dd]/10"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back to Trip

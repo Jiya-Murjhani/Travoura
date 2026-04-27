@@ -13,13 +13,67 @@
     --color-gold-muted: #8C6D2F;
     --color-gold-light: #E8C86C;
     --color-sand: #E8DCC8;
-    --color-text-primary: #1A1A1A;
+    --color-text-primary: #e8e4f0;
     --color-text-secondary: #6B6560;
     --color-text-inverse: #F7F5F0;
     --color-text-muted: #9B9590;
     --color-alert-weather: #C97B2C;
     --color-alert-safety: #B33A3A;
     --color-alert-clear: #3A7D5C;
+
+    /* === SHADCN UI VARIABLES (DARK LAVENDER) === */
+    --background: #0f0e17;
+    --foreground: #e8e4f0;
+    --card: #1a1826;
+    --card-foreground: #e8e4f0;
+    --popover: #1a1826;
+    --popover-foreground: #e8e4f0;
+    --muted: rgba(139,120,221,0.15);
+    --muted-foreground: rgba(200,192,230,0.6);
+    --accent: rgba(139,120,221,0.15);
+    --accent-foreground: #e8e4f0;
+    --border: rgba(139,120,221,0.12);
+    --input: rgba(139,120,221,0.12);
+    --ring: rgba(139,120,221,0.35);
+    --primary: #8b78dd;
+    --primary-foreground: #e8e4f0;
+    --secondary: #221f33;
+    --secondary-foreground: #e8e4f0;
+    --destructive: #f87171;
+    --destructive-foreground: #1a1826;
+
+    /* === POST-LOGIN REDESIGN PALETTE (CSS Custom Properties) === */
+    /* Backgrounds */
+    --app-bg-primary: #0f0e17;
+    --app-bg-secondary: #1a1826;
+    --app-bg-tertiary: #221f33;
+    --app-bg-glass: rgba(139,120,221,0.06);
+
+    /* Borders */
+    --app-border-default: rgba(139,120,221,0.12);
+    --app-border-hover: rgba(139,120,221,0.35);
+    --app-border-strong: rgba(139,120,221,0.5);
+
+    /* Text */
+    --app-text-primary: #e8e4f0;
+    --app-text-secondary: rgba(200,192,230,0.6);
+    --app-text-tertiary: rgba(200,192,230,0.35);
+
+    /* Accent */
+    --app-accent-primary: #8b78dd;
+    --app-accent-light: #b8a9f0;
+    --app-accent-soft: rgba(139,120,221,0.15);
+    --app-accent-glow: rgba(139,120,221,0.08);
+
+    /* Status colors */
+    --app-success: #6ee7b7;
+    --app-warning: #f6c90e;
+    --app-danger: #f87171;
+
+    /* Gradient */
+    --app-gradient-primary: linear-gradient(135deg, #1a1826 0%, #0f0e17 100%);
+    --app-gradient-accent: linear-gradient(135deg, #2d2650 0%, #1a1826 100%);
+    --app-gradient-card: linear-gradient(135deg, rgba(139,120,221,0.08) 0%, rgba(139,120,221,0.02) 100%);
 
     /* === NEW DASHBOARD REDESIGN PALETTE === */
     --sand: #F5F0E8;
@@ -71,7 +125,8 @@
 
   body {
     font-family: var(--font-ui);
-    background-color: var(--color-surface);
+    background-color: var(--color-surface); /* Will be overridden by App container for post-login, or we can just set it here */
+    background: #0f0e17;
     color: var(--color-text-primary);
     overflow-x: hidden;
   }
@@ -156,6 +211,19 @@
   }
 
   /* === NEW DASHBOARD UTILITIES === */
+  .dashboard-card {
+    background: var(--app-bg-glass);
+    border: 0.5px solid var(--app-border-default);
+    border-radius: 10px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+  }
+  .dashboard-card:hover {
+    border-color: var(--app-border-hover);
+    background: var(--app-gradient-card);
+  }
+
   @keyframes pulse { 
     0%, 100% { opacity: 1; transform: scale(1); } 
     50% { opacity: 0.5; transform: scale(0.8); } 

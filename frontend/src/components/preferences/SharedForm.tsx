@@ -11,8 +11,8 @@ interface StepProps {
 
 const ChipContainer = ({ children, label, caption }: { children: React.ReactNode, label?: string, caption?: string }) => (
   <div className="space-y-3 mb-6">
-    {label && <Label className="text-base text-foreground font-semibold">{label}</Label>}
-    {caption && <p className="text-xs text-muted-foreground mt-0 mb-2">{caption}</p>}
+    {label && <Label className="text-base text-white font-semibold">{label}</Label>}
+    {caption && <p className="text-xs text-[#8b78dd]/70 mt-0 mb-2">{caption}</p>}
     <div className="flex flex-wrap gap-2">
       {children}
     </div>
@@ -24,7 +24,7 @@ const ChipItem = ({ label, selected, onClick }: { label: string, selected: boole
     type="button"
     onClick={onClick}
     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border
-      ${selected ? "bg-primary text-primary-foreground border-primary shadow-sm scale-[1.02]" : "bg-card text-muted-foreground border-border/50 hover:border-primary/50 hover:bg-muted"}`}
+      ${selected ? "bg-[#8b78dd] text-white border-[#8b78dd] shadow-sm scale-[1.02]" : "bg-[#1a1826] text-[#8b78dd] border-[#8b78dd]/20 hover:border-[#8b78dd]/50 hover:bg-[#8b78dd]/10"}`}
   >
     {label}
   </button>
@@ -64,12 +64,12 @@ export const Step1TravelStyle = ({ data, onChange }: StepProps) => {
 
       {data.group_type === "Family" && (
         <div className="space-y-2 animate-fade-in mt-4">
-          <Label>Ages of children</Label>
+          <Label className="text-white">Ages of children</Label>
           <Input 
             value={(data as any).child_ages || ""} 
             onChange={(e) => onChange("child_ages" as any, e.target.value)} 
             placeholder="e.g. 5, 8, 12" 
-            className="rounded-xl border-border bg-muted/50 focus-visible:ring-2"
+            className="rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]"
           />
         </div>
       )}
@@ -93,14 +93,14 @@ export const Step2Budget = ({ data, onChange }: StepProps) => {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Home Currency</Label>
-          <Input value={data.home_currency || ""} onChange={(e) => onChange("home_currency", e.target.value.toUpperCase())} placeholder="e.g. USD" maxLength={3} className="rounded-xl border-border bg-muted/50 focus-visible:ring-2" />
+          <Label className="text-white">Home Currency</Label>
+          <Input value={data.home_currency || ""} onChange={(e) => onChange("home_currency", e.target.value.toUpperCase())} placeholder="e.g. USD" maxLength={3} className="rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]" />
         </div>
         <div className="space-y-2">
-          <Label>Daily Max Spend</Label>
+          <Label className="text-white">Daily Max Spend</Label>
           <div className="relative">
-            <span className="absolute left-3 top-2.5 text-muted-foreground">{data.home_currency || "$"}</span>
-            <Input type="number" value={data.budget_daily_max || ""} onChange={(e) => onChange("budget_daily_max", parseFloat(e.target.value))} placeholder="e.g. 200" className="pl-10 rounded-xl border-border bg-muted/50 focus-visible:ring-2" />
+            <span className="absolute left-3 top-2.5 text-[#8b78dd]/60">{data.home_currency || "$"}</span>
+            <Input type="number" value={data.budget_daily_max || ""} onChange={(e) => onChange("budget_daily_max", parseFloat(e.target.value))} placeholder="e.g. 200" className="pl-10 rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]" />
           </div>
         </div>
       </div>
@@ -123,9 +123,9 @@ export const Step3Dietary = ({ data, onChange }: StepProps) => {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="space-y-2 mb-6">
-        <Label className="text-base text-foreground font-semibold">Dietary needs</Label>
+        <Label className="text-base text-white font-semibold">Dietary needs</Label>
         <select 
-          className="flex h-10 w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 w-full rounded-xl border border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-[#8b78dd] disabled:cursor-not-allowed disabled:opacity-50"
           value={data.dietary_prefs || ""}
           onChange={(e) => onChange("dietary_prefs", e.target.value)}
         >
@@ -135,8 +135,8 @@ export const Step3Dietary = ({ data, onChange }: StepProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label>Food allergies</Label>
-        <Input value={data.food_allergies || ""} onChange={(e) => onChange("food_allergies", e.target.value)} placeholder="e.g. peanuts, shellfish" className="rounded-xl border-border bg-muted/50 focus-visible:ring-2" />
+        <Label className="text-white">Food allergies</Label>
+        <Input value={data.food_allergies || ""} onChange={(e) => onChange("food_allergies", e.target.value)} placeholder="e.g. peanuts, shellfish" className="rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]" />
       </div>
 
       {data.dietary_prefs && data.dietary_prefs !== "None" && (
@@ -171,8 +171,8 @@ export const Step4Mobility = ({ data, onChange }: StepProps) => {
       </ChipContainer>
 
       <div className="space-y-2">
-        <Label>Accessibility needs (Optional)</Label>
-        <Input value={data.accessibility_needs || ""} onChange={(e) => onChange("accessibility_needs", e.target.value)} placeholder="e.g. wheelchair access required" className="rounded-xl border-border bg-muted/50 focus-visible:ring-2" />
+        <Label className="text-white">Accessibility needs (Optional)</Label>
+        <Input value={data.accessibility_needs || ""} onChange={(e) => onChange("accessibility_needs", e.target.value)} placeholder="e.g. wheelchair access required" className="rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]" />
       </div>
     </div>
   );
@@ -188,13 +188,13 @@ export const Step5TripContext = ({ data, onChange }: StepProps) => {
       </ChipContainer>
 
       <div className="space-y-2">
-        <Label>Home City / Airport</Label>
-        <Input value={data.home_city || ""} onChange={(e) => onChange("home_city", e.target.value)} placeholder="e.g. New York, JFK" className="rounded-xl border-border bg-muted/50 focus-visible:ring-2" />
+        <Label className="text-white">Home City / Airport</Label>
+        <Input value={data.home_city || ""} onChange={(e) => onChange("home_city", e.target.value)} placeholder="e.g. New York, JFK" className="rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]" />
       </div>
 
       <div className="space-y-2">
-        <Label>Passports</Label>
-        <Input value={(data.passports || []).join(", ")} onChange={(e) => onChange("passports", e.target.value.split(",").map(s => s.trim()).filter(Boolean))} placeholder="e.g. US, UK (comma separated)" className="rounded-xl border-border bg-muted/50 focus-visible:ring-2" />
+        <Label className="text-white">Passports</Label>
+        <Input value={(data.passports || []).join(", ")} onChange={(e) => onChange("passports", e.target.value.split(",").map(s => s.trim()).filter(Boolean))} placeholder="e.g. US, UK (comma separated)" className="rounded-xl border-[#8b78dd]/20 bg-[#1a1826] text-[#8b78dd] placeholder-[#8b78dd]/40 focus-visible:ring-[#8b78dd]" />
       </div>
     </div>
   );
@@ -217,7 +217,7 @@ export const Step6AI = ({ data, onChange }: StepProps) => {
 
       <div className="flex items-center space-x-2 pt-4">
         <Switch id="auto-apply" checked={data.auto_apply_prefs ?? true} onCheckedChange={(checked) => onChange("auto_apply_prefs", checked)} />
-        <Label htmlFor="auto-apply">Auto-apply my preferences to new plans</Label>
+        <Label className="text-white" htmlFor="auto-apply">Auto-apply my preferences to new plans</Label>
       </div>
     </div>
   );
